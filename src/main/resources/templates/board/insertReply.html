@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	 
+	 <head>
+		 <th:block layout:fragment="script">
+			 <script th:inline="javascript">
+				$(function() {
+					 // 제목 글자 수 제한
+					 $("#boardTitle").keyup(function(e) {
+						 text = $(this).val();
+						 
+						 if(text.length > 30) {
+							 $(this).val($(this).val().substring(0, 30));
+						 }
+					 })
+					 
+					 // 내용 글자 수 제한
+					 $("#boardContent").keyup(function(e) {
+						 totalByte = 0;
+						 text = $(this).val();
+						 
+						 for(let i = 0; i < text.length; i++) {
+							 let currentByte = text.charCodeAt(i);
+							 if(currentByte > 128) {
+								 totalByte += 2;
+							 } else {
+								 totalByte++;
+							 }
+						 }
+						 
+						 if(text.length == 0 || text.length == '') {
+							 $(".textCnt").text(0);
+						 } else {
+							 $(".textCnt").text(totalByte);
+						 }
+						 
+						 if(totalByte > limitByte) {
+							 $(this).val($(this).val().substring(0, 1000))
+						 }
+					 })	 
+					
+				 });
+				
+				 
+				 function fnBtnMoveList() {
+					 window.location.href = '/board/boardList'
+				 };
+			 </script>
+		 </th:block>
+		 <th:block layout:fragment="css">
+			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
+			 <style>
+				 #boardContent {
+					 resize: none;
+				 }
+				 
+				 #btns {
+					 margin-top: 20px;
+				 }
+			 </style>
+		 </th:block>
+	 </head>
+	 <body
+		 <div layout:fragment="content">
+			 <div>
+				<h3>답글 등록</h3>
+				<form id="insertForm" action="/board/insertReply" method="post">
+					<input type="text" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
+					<input type="text" name="boardTitle" id="boardTitle" placeholder="제목"><br>
+					<div>
+						<label for="userId" id="userId">작성자: </label>
+	  					<input type="text" name="boardWriter" id="boardWriter">					
+					</div>
+					<div>
+						<label for="boardPw">비밀번호: </label>
+						<input type="password" name="boardPw" id="boardPw">
+					</div>
+					<textarea name="boardContent" id="boardContent" cols="50" rows="6"></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
+					<div id="btns">
+						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnCancel" onclick="history.back();">취소</button>
+						<button type="submit" id="btnDone">등록</button>
+					</div>
+				</form>
+			 </div>
+		 </div>
+	 </body>
+</html>

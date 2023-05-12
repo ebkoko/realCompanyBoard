@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org/dtd/DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.CommentMapper">
+	<insert id="insertComment" parameterType="comment">
+		INSERT INTO T_SB_COMMENT(
+			BOARD_NO,
+			COMM_NO,
+			COMM_LV,
+			COMM_OR,
+			COMM_GR,
+			COMM_WRITER,
+			COMM_CONTENT,
+			COMM_REGDATE
+		) VALUES (
+			#{boardNo},
+			(
+				SELECT IFNULL(MAX(C.COMM_NO), 0) + 1 FROM T_SB_COMMENT C
+			),
+			0,
+			0,
+			0,
+			#{commWriter},
+			#{commContent},
+			now()
+		)
+	</insert>
+	
+	<select id="getComment" parameterType="map" resultType="comment">
+		SELECT * FROM T_SB_COMMENT WHERE BOARD_NO = #{boardNo} ORDER BY COMM_GR, COMM_OR
+	</select>
+<!--	<select id="getComment" parameterType="int" resultType="comment">
+		SELECT * FROM T_SB_COMMENT WHERE BOARD_NO = #{boardNo} ORDER BY
+	</select> -->
+	
+	<delete id="deleteComment" parameterType="int">
+		DELETE FROM T_SB_COMMENT WHERE COMM_NO = #{commNo}
+	</delete>
+</mapper>

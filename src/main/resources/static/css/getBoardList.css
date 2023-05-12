@@ -1,0 +1,14 @@
+.topMent {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+#btnWrite {
+	margin-right: 15px;
+}
+
+table, tr, td, th {
+	border: 1px solid black;
+	border-collapse: collapse;
+}

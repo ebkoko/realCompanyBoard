@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	 
+	 <head>
+		 <th:block layout:fragment="script">
+			 <script th:inline="javascript">
+				 $(function() {
+					 
+				 })
+			 </script>
+		 </th:block>
+		 <th:block layout:fragment="css">
+			 <style>
+				 body {
+					 height: 100%;
+				 }
+				 .homeContent {
+					 text-align: center;
+				 }
+			 </style>
+		 </th:block>
+	 </head>
+	 <body>
+		 <div layout:fragment="content">
+			 <div class="homeContent">
+				 <h1>게시판 홈</h1>
+				 <p>A. 게시판 등록, 수정, 삭제, 조회 구현</p>
+				 <p>B. 검색, 페이징 처리</p>
+				 <p>C. 로그인(세션처리), 로그아웃</p>
+				 <p>D. 댓글, 답글 처리</p>
+				 <p>E. 파일 Up, Down 처리</p>
+				 <p>F. 게시판 Data DownLoad(텍스트, 엑셀, 기타)</p>
+			 </div>
+		 </div>
+	 </body>
+</html>

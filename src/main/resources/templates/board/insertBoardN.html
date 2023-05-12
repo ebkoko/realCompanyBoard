@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	 
+	 <head>
+		 <th:block layout:fragment="script">
+			 <script th:inline="javascript">
+				 // 추가된 파일들을 담을 배열. File 객체로 하나씩 담음
+				 let uploadFiles = [];
+				 let text = '';
+				 let limitByte = 1000;
+				 let totalByte = 0;
+				 
+				 $(function() {
+					 // input type="file"이 변경되면 미리보기 동작
+					 $("#btnAtt").on("change", function(e) {
+						// 추가된 파일들을 변수로 받아옴
+						const files = e.target.files;
+						// 변수로 받아온 파일들을 배열 형태로 변환
+						const fileArr = Array.prototype.slice.call(files);
+						
+						// 배열에 있는 파일들을 하나씩 꺼내서 처리
+						for(f of fileArr) {
+							imageLoader(f);
+						} 
+					 });
+					 
+					 $("#insertForm").on("submit", function() {
+						// btnAtt에 uploadFiles에 있는 파일들을 담아준다.
+						dt = new DataTransfer();
+						
+						for(f in uploadFiles) {
+							const file = uploadFiles[f];
+							dt.items.add(file);
+						} 
+						
+						$("#btnAtt")[0].files = dt.files;
+					 });
+					 
+					 // 제목 글자 수 제한
+					 $("#boardTitle").keyup(function(e) {
+						 text = $(this).val();
+						 
+						 if(text.length > 30) {
+							 $(this).val($(this).val().substring(0, 30));
+						 }
+					 });
+					 
+					 // 내용 글자 수 제한
+					 $("#boardContent").keyup(function(e) {
+						 totalByte = 0;
+						 text = $(this).val();
+						 
+						 for(let i = 0; i < text.length; i++) {
+							 let currentByte = text.charCodeAt(i);
+							 if(currentByte > 128) {
+								 totalByte += 2;
+							 } else {
+								 totalByte++;
+							 }
+						 }
+						 
+						 if(text.length == 0 || text.length == '') {
+							 $(".textCnt").text(0);
+						 } else {
+							 $(".textCnt").text(totalByte);
+						 }
+						 
+						 if(totalByte > limitByte) {
+							 $(this).val($(this).val().substring(0, 1000))
+						 }
+					 })
+				 });
+				 
+				 // 미리보기 영역에 들어갈 img태그 생성 및 선택된 파일을 Base64 인코딩된 문자열 형태로 미리보기 가능하게 해줌
+				 function imageLoader(file) {
+					uploadFiles.push(file);
+					
+					const reader = new FileReader();
+					
+					reader.onload = function(e) {
+						// 이미지를 표출해 줄 img태그 선언
+						let img = document.createElement("img");
+						img.setAttribute("style", "width: 100%; height: 100%; z-index: none;");
+						
+						// 이미지 파일인지 아닌지 체크
+						if(file.name.toLowerCase().match(/(.*?)\.(jpg|jpeg|png|gif|svg|bmp)$/)) {
+							// 이미지 파일 미리보기 처리
+							img.src = e.target.result;
+						} else if(file.name.toLowerCase().match(/(.*?)\.(zip)$/)) {
+							img.src = "/images/zip.png";
+						} else {
+							img.src = "/images/document.png";
+						}
+						
+						// 미리보기 영역에 추가
+						// 미리보기 이미지 태그와 삭제 버튼, 파일명을 표출하는 p태그를 묶어주는 div를 만들어 미리보기 영역에 추가
+						$("#attZone").append(makeDiv(img, file));
+					} ;
+					
+					// 파일을 Base64 인코딩된 문자열로 변경
+					reader.readAsDataURL(file);
+				 };
+				 
+				 // 미리보기 영역에 들어갈 div(img + button + p)를 생성하고 리턴
+				 function makeDiv(img, file) {
+					// div 생성
+					let div = document.createElement("div");
+					div.setAttribute("style", "display: inline-block; position: relative;"
+					 + " width: 150px; height: 120px; margin: 5px; border: 1px solid #00f; z-index: 1;");
+					 
+					 // button 생성
+					 let btn = document.createElement("input");
+					 btn.setAttribute("type", "button");
+					 btn.setAttribute("value", "x");
+					 btn.setAttribute("delFile", file.name);
+					 btn.setAttribute("style", "width: 30px; height: 30px; position: absolute;"
+					  + " right: 0px; bottom: 0px; z-index: 999; background-color: rgba(255, 255, 255, 0.1);"
+					  + " color: #f00;");
+					  
+					  // 버튼 클릭 이벤트(버튼 클릭 시 해당 파일이 삭제되도록 설정)
+					  btn.onclick = function(e) {
+						// 클릭된 버튼
+						const ele = e.srcElement;
+						// delFile(파일이름) 속성 꺼내오기: 삭제도리 파일명
+						const delFile = ele.getAttribute("delFile");
+						
+						for(let i = 0; i < uploadFiles.length; i++) {
+							// 배열에 담아놓은 파일들 중에 해당 파일 삭제
+							if(delFile == uploadFiles[i].name) {
+								uploadFiles.splice(i, 1);
+							}
+						}  
+						
+						// 버튼 클릭 시 btnAtt에 첨부된 파일도 삭제 -> 내용이 첨부파일 추가와 같은데 무슨 차이????
+						dt = new DataTransfer();
+						
+						for(f in uploadFiles) {
+							const file = uploadFiles[f];
+							dt.items.add(file);
+						}
+						
+						$("#btnAtt")[0].files = dt.files;
+						
+						// 해당 img를 담고있는 부모태그인 div 삭제
+						const parentDiv = ele.parentNode;
+						$(parentDiv).remove();
+					  }
+					  
+					  // 파일명 표출할 p태그 생성
+					  const fName = document.createElement("p");
+					  fName.setAttribute("style", "display: inline-block; font-size: 8px;");
+					  fName.textContent = file.name;
+					  
+					  // div에 하나씩 추가
+					  div.appendChild(img);
+					  div.appendChild(btn);
+					  div.appendChild(fName);
+					  
+					  return div;					  
+				 }
+				 
+				 function fnBtnMoveList() {
+					 window.location.href = '/board/boardList'
+				 };
+			 </script>
+		 </th:block>
+		 <th:block layout:fragment="css">
+			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
+			 <style>
+				 #boardContent {
+					 resize: none;
+				 }
+				 
+				 #btns {
+					 margin-top: 20px;
+				 }
+			 </style>
+		 </th:block>
+	 </head>
+	 <body
+		 <div layout:fragment="content">
+			 <div>
+				<h3>새 글 등록</h3>
+				<form id="insertForm" action="/board/board" method="post" enctype="multipart/form-data">
+					<select name="cateNo" id="cateNo" required>
+						<option value="" disabled selected>글 종류</option>
+						<option value="1">뉴스</option>
+						<option value="2">유머</option>
+					</select>
+					<input type="text" name="boardTitle" id="boardTitle" placeholder="제목" required><br>
+					<div>
+						<label for="userId" id="userId">작성자: </label>
+						<input type="text" name="boardWriter" id="boardWriter" required> 						
+					</div>
+					<div>
+						<lable for="boardPw">비밀번호: </lable>
+						<input type="password" name="boardPw" id="boardPw" required>
+					</div>
+					<textarea name="boardContent" id="boardContent" cols="50" rows="6" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
+					<div id="filePreview">
+						<input type="file" name="uploadFiles" id="btnAtt" multiple="multiple">
+						<div id="attZone" data-placeholder="파일선택 버튼을 눌러 파일을 첨부하세요."></div>
+					</div>
+					<div id="btns">
+						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnCancel" onclick="history.back();">취소</button>
+						<button type="submit" id="btnDone">등록</button>
+					</div>
+				</form>
+			 </div>
+		 </div>
+	 </body>
+</html>

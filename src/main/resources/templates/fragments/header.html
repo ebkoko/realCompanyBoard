@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<body>
+		<header th:fragment="header">
+			<h1>
+				<a th:href="@{/}">홈</a>
+			</h1>
+			<nav>
+				<ul class="main-nav">
+					<li>
+						<a th:href="@{/board/boardList}">게시판 목록</a>
+					</li>
+				</ul>
+			</nav>
+			<nav>
+				<ul class="user-nav">
+					<div th:if="${session.loginUser eq null}" th:remove="tag">
+						<li>
+							<a th:href="@{/user/login}">로그인</a>
+						</li>
+					</div>
+					<div th:if="${session.loginUser ne null}" th:remove="tag">
+						<li>
+							<p class="loginUser"><a class="loginUserId" href="#" th:text="${session.loginUser.userId}"></a>님</p>
+						</li>
+						<li>
+							<a th:href="@{/user/logout}">로그아웃</a>
+						</li>
+					</div>
+				</ul>
+			</nav>
+		</header>
+	</body>	  
+</html>

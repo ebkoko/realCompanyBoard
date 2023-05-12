@@ -1,0 +1,55 @@
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: powderblue;
+}
+
+footer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: powderblue;
+}
+
+ul, li {
+	list-style: none;
+}
+
+a {
+	text-decoration: none;
+	color: black;
+}
+
+a:hover {
+	color: blue;
+}
+
+h1 a {
+	margin-left: 10px;
+}
+
+.main-nav li a {
+	font-size: 1.2em;
+}
+
+.user-nav {
+	margin-right: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.loginUser {
+	margin-right: 5px;
+	display: inline-block;
+}
+
+.loginUserId:hover {
+	color: black;
+}
+
+.loginUserId {
+	pointer-events: none;
+	cursor: default;
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org/dtd/DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.UserMapper">
+	<select id="idCheck" parameterType="string" resultType="user">
+		SELECT *
+			FROM T_SB_USER
+			WHERE USER_ID = #{userId}
+	</select>
+</mapper>

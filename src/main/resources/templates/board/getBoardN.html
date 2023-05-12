@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+	 
+	 <head>
+		 <th:block layout:fragment="script">
+			 <script th:inline="javascript">
+				 const boardNo = /*[[getBoard.boardNo]]*/;
+				 const fileNo = /*[[boardFileList.fileNo]]*/;
+				 const commNo = /*[[comment.commNo]]*/;
+				 $(function() {
+					 
+				 });
+				 
+				 function fnBtnMoveList() {
+					 window.location.href = '/board/boardList'
+				 }
+				 
+				 function fnBtnDelete() {					 
+					 $.ajax({
+						 url: '/board/pwCheck',
+						 type: 'post',
+						 data: $("#boardForm").serialize(),
+						 success: function(obj) {
+								 
+							 // 게시글 비밀번호 확인
+							 if(obj.item.msg == "pwFail") {
+								 alert("게시글 비밀번호가 틀립니다.");
+								 $("#boardPw").val('');
+								 return;
+							 } else if(obj.item.msg == "boardNoDiff") {
+								 alert("게시글 번호가 맞지않습니다.");
+								 return;
+							 }
+							 
+							 $.ajax({
+								 url: '/board/board',
+								 type: 'delete',
+								 data: {
+									 boardNo: $("#boardNo").val()
+								 },
+								 success: function() {
+									 alert("삭제되었습니다.");
+									 window.location.href = '/board/boardList'
+								 },
+								 error: function(e) {
+									 console.log(e);
+								 }
+							 })
+						
+						 },
+						 fail: function(result) {
+							 console.log(result.responseText);
+							 fail(error);
+						 }						 
+					 });
+						 
+				 }
+				 
+				 function fnBtnModify() {
+					 if($(".boardPw").css("display") == "block") {
+						 $.ajax({
+							 url: '/board/pwCheck',
+							 type: 'post',
+							 data: $("#boardForm").serialize(),
+							 success: function(obj) {
+								 console.log(obj);
+								 
+								 // 게시글 비밀번호 확인
+								 if(obj.item.msg == "pwFail") {
+									 alert("게시글 비밀번호가 틀립니다.");
+									 $("#boardPw").val('');
+									 return;
+								 } else if(obj.item.msg == "boardNoDiff") {
+									 alert("게시글 번호가 맞지않습니다.");
+									 return;
+								 }
+								 
+								 window.location.href = '/board/updateBoard/' + $("#boardNo").val();
+							 },
+							 error: function(e) {
+								 console.log(e);
+								 
+							 }
+					 	})
+				 	 } else {
+						  window.location.href = '/board/updateBoard/' + $("#boardNo").val();
+					  }
+					 
+					 
+					 
+				 }
+				 
+				 function fnFileDown(boardNo, fileNo) {
+					 window.location = "/board/fileDown?boardNo="
+					 			+ boardNo + "&fileNo=" + fileNo;
+				 }
+				 
+				 function fnBtnReply() {
+					 $.ajax({
+						 url: '/board/insertReply',
+						 type: 'get',
+						 data: {
+							 boardNo: boardNo
+						 },
+						 success: function() {
+							 
+							 window.location.href = '/board/insertReply'
+						 },
+						 error: function(e) {
+							 console.log(e);
+						 }
+					 })
+					 
+				 }
+				 
+				 function fnBtnCommDel(commNo) {
+					 $.ajax({
+						 url: '/comment/deleteComment',
+						 type: 'delete',
+						 data: {
+							 commNo: commNo
+						 },
+						 success: function() {
+							 alert("삭제되었습니다.");
+							 window.location.href = '/board/board/' + $("#boardNo").val();
+						 },
+						 error: function(e) {
+							 console.log(e);
+						 }
+					 })
+				 }
+			 </script>
+		 </th:block>
+		 <th:block layout:fragment="css">
+			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
+			 <style>
+				 .cate {
+					 margin-bottom: 16px;
+				 }
+				 
+				 #boardContent {
+					 resize: none;
+				 }
+				 
+				 .boardFileEach {
+					 display: inline-block;
+					 position: relative;
+					 width: 150px;
+					 height: 120px;
+					 margin: 5px;
+					 border: 1px solid blue;
+					 z-index: 1;
+				 }
+				 
+				 .fileImg {
+					 width: 100%;
+					 height: 100%;
+					 z-index: none;
+					 /*cursor: pointer;*/
+				 }
+				 
+				 .fileNm {
+					 display: inline-block;
+					 font-size: 8px;
+					 cursor: pointer;
+				 }
+				 
+				 .downloadMent {
+					 font-size: 9px;
+				 }
+				 
+				 #btns {
+					 margin-top: 20px;
+				 }
+				 
+				 .commT {
+					 border: 1px #E0E0E0 solid;
+					 border-radius: 10px;
+					 width: 800px;
+					 margin: 0px;
+				 }
+				 
+				 #commentTd {
+					 padding: 10px;
+/*					 text-align: center;*/
+				 }
+				 
+				 .commWriter {
+					 font-weight: 600;
+					 width: 15%;
+					 color: black;
+					 text-align: center;
+				 }
+				 
+				 .commContent {
+					 text-align: left;
+					 width: 40%;
+					 color: black;
+				 }
+				 
+				 .commRegdate {
+					 width: 25%;
+					 color: black;
+					 text-align: center;
+				 }
+				 
+				 .btnCommDel {
+					 width: 10%;
+					 text-align: center;
+				 }
+				 
+				 .btnCocomm {
+					 width: 10%;
+					 text-align: center;
+				 }
+				 
+				 #btnCommDel {
+					 padding: 5px;
+					 border-radius: 10px;
+					 background-color: #F1F1F1;
+					 font-size: 0.9em;
+					 text-decoration: none;
+				 }
+				 
+				 #btnCocomm {
+					 padding: 5px;
+					 border-radius: 10px;
+					 background-color: #F1F1F1;
+					 font-size: 0.9em;
+					 text-decoration: none;
+				 }
+				 
+				 .btnCommDel:hover {
+					 color: black;
+/*					 background-color: black;*/
+				 }
+				 
+				 .commContentInsert {
+					 resize: none;
+					 border: 1px #E0E0E0 solid;
+					 border-radius: 10px;
+					 padding: 8px;
+					 width: 780px;
+				 }
+				 
+				 #btnCommDone {
+					 position: relative;
+					 left: 725px;
+					 border: 1px #F1F1F1 solid;
+					 border-radius: 10px;
+					 background-color: #F1F1F1;
+					 padding: 5px;
+					 font-size: 0.9em;
+				 }
+				 
+				 #btnCommDone:hover {
+					 cursor: pointer;
+					 color: #F1F1F1;
+					 background-color: black;
+				 }
+				 
+				 .commForm {
+					 margin-bottom: 10px;
+				 }
+				 
+				 .wrapCommWriter {
+					 margin-bottom: 5px;
+				 }
+			 </style>
+		 </th:block>
+	 </head>
+	 <body
+		 <div layout:fragment="content">
+			 <div>
+				<h3>게시글 상세(비회원)</h3>
+				<form id="boardForm">
+					<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
+					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
+					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
+					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
+					<span>제목: </span><input type="text" name="boardTitle" id="boardTitle" th:value="${getBoard.boardTitle}" readonly><br>
+					<p th:if="${getBoard.boardPw == null}" th:text="'작성자: ' + ${getBoard.boardWriter}"></p>
+					<p th:unless="${getBoard.boardPw == null}" th:text="'작성자: [비회원]' + ${getBoard.boardWriter}"></p>
+					<div th:if="${getBoard.boardPw != null}" class="boardPw">
+						<label for="boardPw">비밀번호: </label><input type="password" name="boardPw" id="boardPw">						
+					</div>
+					<p th:text="${'작성일: ' + #strings.substring(getBoard.boardRegdate, 0, 10) + '&nbsp;' + #strings.substring(getBoard.boardRegdate, 11, 19)}"></p>
+					<p th:text="'조회수: ' + ${getBoard.boardCnt}"></p>
+					<textarea name="boardContent" id="boardContent" cols="50" rows="6" th:text="${getBoard.boardContent}" readonly></textarea>
+					<div id="filePreview">
+						<p th:if="${boardFileList.size > 0}" class="downloadMent">첨부파일명을 클릭하시면 다운로드 됩니다.</p>
+						<div id="attZone">
+							<div th:each="boardFile : ${boardFileList}" class="boardFileEach">
+								<input type="hidden" th:id="'fileNo' + ${boardFileStat.index}" 
+									th:name="'fileNo' + ${boardFileStat.index}"
+									th:value="${boardFile.fileNo}">
+								<input type="hidden" th:id="'fileName' + ${boardFileStat.index}" 
+									th:name="'fileName' + ${boardFileStat.index}"
+									th:value="${boardFile.fileName}">									
+								<img th:if="${boardFile.fileCate} == 'img'" th:id="'img' + ${boardFile.fileNo}"
+									th:src="@{'/upload/' + ${boardFile.fileName}}" class="fileImg">
+								<img th:if="${boardFile.fileCate} == 'zip'" th:id="'zip' + ${boardFile.fileNo}"
+									th:src="@{/images/zip.png}" class="fileImg">
+								<img th:unless="${boardFile.fileCate} == 'img' or ${boardFile.fileCate} == 'zip'" th:id="'doc' + ${boardFile.fileNo}"
+									th:src="@{/images/document.png}" class="fileImg">
+								<p th:id="'fileNm' + ${boardFile.fileNo}" class="fileNm"
+									th:onclick="fnFileDown([[${boardFile.boardNo}]], [[${boardFile.fileNo}]])"
+									th:text="${boardFile.fileOriName}"></p>
+							</div>
+						</div>
+					</div>
+					<div th:if="${getBoard.boardPw == null}" id="btns">
+						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
+					</div>
+					<div th:unless="${getBoard.boardPw == null}" id="btns">
+						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()">삭제</button>
+						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
+						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
+					</div>
+				</form>
+				<br><br><br>
+				
+				<h3>댓글</h3>
+				<table class="commT">
+					<tr th:each="comment : ${comment}" class="commentEach">			
+						<td id="commentTd" class="commWriter" th:if="${comment.commLv != 0}" th:text="'&rdca;&nbsp;' + ${comment.commWriter}"></td>
+						<td id="commentTd" class="commWriter" th:unless="${comment.commLv != 0}" th:text="${comment.commWriter}"></td>
+						<td id="commentTd" class="commContent" th:text="${comment.commContent}"></td>
+						<td id="commentTd" class="commRegdate" th:text="${#strings.substring(comment.commRegdate, 0, 10) + '&nbsp;' + #strings.substring(comment.commRegdate, 11, 19)}"></td>
+						<td id="commentTd" class="btnCommDel">
+							<input type="hidden" name="commNo" id="commNo" th:value="${comment.commNo}">
+<!--							<a id="btnCommDel" href="javascript:void(0);" th:onclick="fnBtnCommDel([[${comment.commNo}]])">삭제</a> -->
+						</td>
+						<td id="commentTd" class="btnCocomm" th:if="${comment.commLv == 0}">
+							<a id="btnCocomm" href="javascript:void(0);" th:onclick="fnBtnCocomm()">대댓글</a>
+						</td>
+					</tr>
+				</table>
+				<br><br>
+				<h3>댓글 쓰기</h3>
+				<div class="commForm">
+					<form action="/comment/insertComment" method="post">
+						<div class="wrapCommWriter">
+							<label for="commWriter" id="commWriter">작성자: </label><input type="text" name="commWriter">
+						</div>
+						<div>
+							<textarea name="commContent" class="commContentInsert" rows="5" cols="50"></textarea>
+						</div>
+						<div>
+							<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
+							<button type="submit" id="btnCommDone">댓글 등록</button>
+						</div>
+					</form>
+				</div>
+			 </div>
+		 </div>
+	 </body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org/dtd/DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboard.mapper.BoardFileMapper">
+<!--	<select id="getMaxFileNo" parameterType="int" resultType="boardFile">
+		SELECT IFNULL(MAX(F.FILE_NO), 0) + 1
+			FROM T_SB_FILE F
+			WHERE F.BOARD_NO = #{boardNo}
+	</select>	
+	
+	<insert id="insertBoardFile" parameterType="boardFile">
+		INSERT INTO T_SB_FILE (
+			BOARD_NO,
+			FILE_NO,
+			FILE_NAME,
+			FILE_ORI_NAME,
+			FILE_PATH,
+			FILE_CATE
+		) VALUES (
+			#{boardNo},
+			(
+				SELECT IFNULL(MAX(F.FILE_NO), 0) + 1
+					FROM T_SB_FILE F
+					WHERE F.BOARD_NO = #{boardNo}
+			),
+			#{fileName},
+			#{fileOriName},
+			#{filePath},
+			#{fileCate}
+		)	
+	</insert>
+	
+	<select id="getBoardFileList" parameterType="int" resultType="boardFile">
+		SELECT *
+			FROM T_SB_FILE
+			WHERE BOARD_NO = #{boardNo}
+	</select>
+	
+	<select id="getBoardFile" parameterType="boardFile" resultType="boardFile">
+		SELECT *
+			FROM T_SB_FILE
+			WHERE BOARD_NO = #{boardNo}
+				AND FILE_NO = #{fileNo}
+	</select> -->
+</mapper>
