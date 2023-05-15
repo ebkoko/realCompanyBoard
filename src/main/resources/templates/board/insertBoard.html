@@ -168,21 +168,29 @@
 			 </script>
 		 </th:block>
 		 <th:block layout:fragment="css">
-			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
 			 <style>
+				 .wrapper {
+					 margin: 0 auto;
+				 }
+				 
 				 #boardContent {
 					 resize: none;
 				 }
 				 
 				 #btns {
 					 margin-top: 20px;
+					 margin-bottom: 50px;
+				 }
+				 
+				 #btnCancel {
+					 margin-left: 300px;
 				 }
 			 </style>
 		 </th:block>
 	 </head>
 	 <body
 		 <div layout:fragment="content">
-			 <div>
+			 <div class="wrapper">
 				<h3>새 글 등록</h3>
 				<form id="insertForm" action="/board/board" method="post" enctype="multipart/form-data">
 					<select name="cateNo" id="cateNo" required>

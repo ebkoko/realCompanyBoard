@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -91,5 +95,11 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public BoardDTO pwCheck(BoardDTO boardDTO) {
 		return boardMapper.pwCheck(boardDTO);
+	}
+	
+	@Override
+	public List<BoardDTO> excelDown(BoardDTO boardDTO) {
+		return boardMapper.excelDown(boardDTO);
+		
 	}
 }

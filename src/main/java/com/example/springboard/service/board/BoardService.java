@@ -3,6 +3,8 @@ package com.example.springboard.service.board;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.springboard.dto.BoardDTO;
@@ -30,4 +32,5 @@ public interface BoardService {
 	
 	BoardDTO pwCheck(BoardDTO boardDTO);
 	
+	List<BoardDTO> excelDown(BoardDTO boardDTO);
 }

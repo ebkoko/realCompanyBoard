@@ -59,4 +59,5 @@ public interface BoardMapper {
 	
 	BoardDTO pwCheck(BoardDTO boardDTO);
 	
+	List<BoardDTO> excelDown(BoardDTO boardDTO);
 }

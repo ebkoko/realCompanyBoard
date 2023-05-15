@@ -113,7 +113,6 @@
 			 </script>
 		 </th:block>
 		 <th:block layout:fragment="css">
-			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
 			 <style>
 				 .cate {
 					 margin-bottom: 16px;
@@ -288,22 +287,22 @@
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 160px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
+						<button type="button" id="btnReply" onclick="fnBtnReply()" style="margin-left: 260px;">답글 쓰기</button>
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 210px;">삭제</button>
 						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 160px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>

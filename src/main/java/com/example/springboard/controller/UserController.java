@@ -40,7 +40,6 @@ public class UserController {
 		
 		try {						
 			UserDTO checkedUser = userService.idCheck(userDTO);
-			System.out.println(checkedUser);
 			
 			// 아이디 확인
 			if(checkedUser == null) {

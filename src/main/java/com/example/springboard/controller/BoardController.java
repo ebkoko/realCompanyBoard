@@ -2,6 +2,7 @@ package com.example.springboard.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -380,9 +381,70 @@ public class BoardController {
 //		response.setContentType("ms-vnd/excel");
 //		response.setHeader("Content-Disposition", "attachment;filename=test01.xlsx"); // 파일이름 지정
 //		//response OutputStream에 엑셀 작성
-//		wb.write(response.getOutputStream());
-//		
+//		wb.write(response.getOutputStream());		
 //		
 //	}
+	
+	@GetMapping("/excelDown")
+	public void excelDownload(BoardDTO boardDTO, HttpServletResponse response) throws IOException {
+		XSSFWorkbook wb = new XSSFWorkbook();
+		Sheet sheet = wb.createSheet("게시판 목록");
+		Row row = null;
+		Cell cell = null;
+		
+		List<BoardDTO> boardListDown = boardService.excelDown(boardDTO);
+		
+		// 첫 행 열 이름 표기
+		int cellCount = 0;
+		row = sheet.createRow(0); // 0번째 행
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("글 번호");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("글 종류");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("글 제목");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("작성자");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("글 비밀번호(비회원시)");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("글 내용");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("첨부파일 개수");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("작성일");
+		cell = row.createCell(cellCount++);
+		cell.setCellValue("조회수");
+		
+		for(int i = 0; i < boardListDown.size(); i++) {
+			row = sheet.createRow(i+1);
+			cellCount = 0;
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardNo());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getCateName());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardTitle());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardWriter());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardPw());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardContent());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getFileNoCnt());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardRegdate());
+			cell = row.createCell(cellCount++);
+			cell.setCellValue(boardListDown.get(i).getBoardCnt());
+		}
+		
+		// 컨텐츠 타입과 파일명 지정
+		response.setContentType("ms-vnd/excel");
+		response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode("게시판_목록", "UTF-8") + ".xlsx");
+		// response OutputStream에 엑셀 작성
+		wb.write(response.getOutputStream());
+		wb.close();
+	}
 	
 }

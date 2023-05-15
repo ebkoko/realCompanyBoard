@@ -22,4 +22,6 @@ public class BoardDTO {
 	private String searchKeyword;	// 검색키워드
 	private int fileNoCnt;			// 첨부파일 갯수
 	private String userRole;		// 유저롤
+	private String cateName;
+	private String fileOriName;
 }

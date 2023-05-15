@@ -9,10 +9,12 @@
 			 <script th:inline="javascript">
 				 const pageNumber = /*[[${pageDTO.cri.pageNum}]]*/;
 				 const startNum = /*[[${pageDTO.cri.startNum}]]*/;
+				 const endPage = /*[[${pageDTO.displayPageNum}]]*/;
 				 $(function() {
 					 $(".pagination a").on("click", function(e) {
 						 e.preventDefault();
 						 
+						 console.log(pageNumber);
 						 $("input[name='pageNum']").val($(this).attr("data-pagingPage"));
 						 $("#searchForm").submit();
 					 })
@@ -21,8 +23,6 @@
 						 $("#input[name='pageNum']").val(1);
 						 $("#searchForm").submit();
 					 })
-					 console.log("startNum: " + startNum);
-					 console.log("pageNum: " + pageNumber);
 					 
 				 });
 			 </script>
@@ -39,6 +39,10 @@
 				 
 				 .tableWrap {
 					 display: inline-block;
+				 }
+				 
+				 #searchForm {
+					 float: left;
 				 }
 				 
 				 #boardTable {
@@ -98,6 +102,29 @@
 					 margin: -20px 0 20px 10px;
 				 }
 				 
+				 .active {
+					 font-weight: 800;
+				 }
+				 
+				 .excelDown {
+					 display: flex;
+					 margin-left: 830px;
+					 margin-bottom: 8px;
+					 
+				 }
+				 
+				 .btnExcel {
+					 border: 1px solid cornflowerblue;
+					 padding: 3px;
+					 background-color: cornflowerblue;
+					 color: white;
+					 font-weight: 600;
+				 }
+				 
+				 .btnExcel:hover {
+					 color: black;
+				 }
+				 
 				 .floor {
 					 clear: both;
 				 }
@@ -115,6 +142,7 @@
 					 <form id="searchForm" action="/board/boardList" method="post">
 						 <input type="hidden" name="pageNum" th:value="${pageDTO.cri.pageNum}">
 						 <input type="hidden" name="amount" th:value="${pageDTO.cri.amount}"> 
+						 <input type="hidden" name="displayPageNum" th:value="${pageDTO.displayPageNum}"
 						 <table>
 							 <tr>
 								 <td>
@@ -130,6 +158,9 @@
 							 </tr>
 						 </table>
 					 </form>
+					 <div class="excelDown">
+						 <a th:href="@{'/board/excelDown'}" class="btnExcel" target="_blank" id="excelDown">엑셀 다운로드</a>
+					 </div>
 					 <table id="boardTable">
 						 <tr>
 							 <th class="boardNo">글 번호</th>
@@ -168,7 +199,7 @@
 							 </li>
 							 <li th:each="page : ${#numbers.sequence(pageDTO.startPage, pageDTO.endPage)}" class="pagination_button">
 								 <a th:href="@{'/board/boardList?page=' + ${page}}" th:text="${page}"
-								 	class="btnPage" th:attr="data-pagingPage=${page}"></a>
+								 	th:class="btnPage" th:classappend="${pageDTO.cri.pageNum == page} ? active : ''" th:attr="data-pagingPage=${page}"></a>
 							 </li>
 							 <li th:if="${pageDTO.next}" class="pagination_button">
 								 <a th:href="@{'/board/boardList?page=' + ${pageDTO.cri.pageNum + 1}}"
@@ -181,9 +212,7 @@
 						 </ul>
 					 </div> 
 				 </div>
-				 <div class="excelDown">
-					 <a href="@{'/board/excelDown'}" class="btnExcel" target="_blank" id="excelDown">엑셀 다운로드</a>
-				 </div>
+				 
 				 
 				 <br class="floor"/>
 			 </div>

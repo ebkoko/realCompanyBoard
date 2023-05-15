@@ -135,7 +135,6 @@
 			 </script>
 		 </th:block>
 		 <th:block layout:fragment="css">
-			 <link rel="stylesheet" th:href="@{/css/login.css}"/>
 			 <style>
 				 .cate {
 					 margin-bottom: 16px;
@@ -159,7 +158,6 @@
 					 width: 100%;
 					 height: 100%;
 					 z-index: none;
-					 /*cursor: pointer;*/
 				 }
 				 
 				 .fileNm {
@@ -185,7 +183,6 @@
 				 
 				 #commentTd {
 					 padding: 10px;
-/*					 text-align: center;*/
 				 }
 				 
 				 .commWriter {
@@ -314,11 +311,11 @@
 					</div>
 					<div th:if="${getBoard.boardPw == null}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
+						<button type="button" id="btnReply" onclick="fnBtnReply()" style="margin-left: 260px;">답글 쓰기</button>
 					</div>
 					<div th:unless="${getBoard.boardPw == null}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 160px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>
