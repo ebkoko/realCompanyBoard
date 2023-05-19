@@ -154,13 +154,17 @@
 			AND BOARD_NO = #{boardNo}
 	</select>
 
-	<select id="excelDown" parameterType="board" resultType="board">
+	<select id="excelDown" parameterType="map" resultType="board">
+	<![CDATA[ 
 		SELECT
 			B.BOARD_NO,
 			C.CATE_NAME CATE_NAME,
 			B.BOARD_TITLE,
 			B.BOARD_WRITER,
-			B.BOARD_PW,
+			(
+				SELECT IF(ISNULL(B.BOARD_PW), '회원', '비회원')
+			)
+			AS USER_YN,
 			B.BOARD_CONTENT,
 			COUNT(F.FILE_NO) FILE_NO_CNT,
 			B.BOARD_REGDATE,
@@ -168,8 +172,54 @@
 		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_CATEGORY C
 		ON B.CATE_NO = C.CATE_NO
 		LEFT OUTER JOIN T_SB_FILE F
-		ON B.BOARD_NO = F.BOARD_NO
+		ON B.BOARD_NO = F.BOARD_NO 
+	]]>
+		<if test="boardSearch.searchKeyword != null and boardSearch.searchKeyword != ''">
+			<if test="boardSearch.searchCondition == 'ALL'">
+			WHERE 1 = 0
+				OR BOARD_TITLE LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+				OR BOARD_CONTENT LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+				OR BOARD_WRITER LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+			</if>
+			<if test="boardSearch.searchCondition != 'ALL'">
+			WHERE 1 = 1
+				<if test="boardSearch.searchCondition == 'TITLE'">
+					AND BOARD_TITLE LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+				</if>
+				<if test="boardSearch.searchCondition == 'CONTENT'">
+					AND BOARD_CONTENT LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+				</if>
+				<if test="boardSearch.searchCondition == 'WRITER'">
+					AND BOARD_WRITER LIKE CONCAT('%', #{boardSearch.searchKeyword}, '%')
+				</if>
+			</if>
+		</if>
+		
+	<![CDATA[ 
 		GROUP BY B.BOARD_NO
-		ORDER BY B.BOARD_NO 
+	    ORDER BY B.BOARD_NO
+	]]> 
 	</select>
+<!--	
+	<select id="excelDown" parameterType="board" resultType="board">
+		SELECT
+			B.BOARD_NO,
+			C.CATE_NAME CATE_NAME,
+			B.BOARD_TITLE,
+			B.BOARD_WRITER,
+			(
+				SELECT IF(ISNULL(B.BOARD_PW), '회원', '비회원')
+			)
+			AS USER_YN,
+			B.BOARD_CONTENT,
+			COUNT(F.FILE_NO) FILE_NO_CNT,
+			B.BOARD_REGDATE,
+			B.BOARD_CNT
+		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_CATEGORY C
+		ON B.CATE_NO = C.CATE_NO
+		LEFT OUTER JOIN T_SB_FILE F
+		ON B.BOARD_NO = F.BOARD_NO 
+		GROUP BY B.BOARD_NO
+	    ORDER BY B.BOARD_NO
+	</select>-->
 </mapper>

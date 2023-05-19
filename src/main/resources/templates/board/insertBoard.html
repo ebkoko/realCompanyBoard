@@ -203,7 +203,7 @@
 					<div>
 						<label for="userId" id="userId">작성자: </label>
 	  					<input type="text" name="boardWriter" id="boardWriter" 
-							th:if="${loginUser.userId != null}" th:value="${loginUser.userId}" readonly   > 						
+							th:if="${loginUser.userId != null}" th:value="${loginUser.userId}" readonly> 						
 					</div>
 					<textarea name="boardContent" id="boardContent" cols="50" rows="6" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
 					<div id="filePreview">

@@ -32,5 +32,7 @@ public interface BoardService {
 	
 	BoardDTO pwCheck(BoardDTO boardDTO);
 	
-	List<BoardDTO> excelDown(BoardDTO boardDTO);
+	List<BoardDTO> excelDown(@RequestParam Map<String, String> paramMap, Criteria cri);
+	
+//	List<BoardDTO> excelDown(BoardDTO boardDTO);
 }

@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -25,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,7 +73,7 @@ public class BoardController {
 		
 		int total = boardService.getBoardTotalCnt(paramMap);
 		mv.addObject("pageDTO", new PageDTO(cri, total)); 
-				
+		
 		return mv;
 	}
 	
@@ -137,15 +137,17 @@ public class BoardController {
 	
 	// 조회수 증가
 	@GetMapping("/updateBoardCnt/{boardNo}")
-	public void updateBoardCnt(@PathVariable int boardNo, HttpServletResponse response) throws IOException {
+	public void updateBoardCnt(@PathVariable("boardNo") int boardNo,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount, HttpServletResponse response) throws IOException {
 		boardService.updateBoardCnt(boardNo);
 		
-		response.sendRedirect("/board/board/" + boardNo);
+		response.sendRedirect("/board/board/" + boardNo + "?pageNum=" + pageNum + "&amount=" + amount);
 	}
 	
 	// 게시글 상세
 	@GetMapping("/board/{boardNo}")
-	public ModelAndView getBoard(@PathVariable int boardNo, HttpSession session, CommentDTO commentDTO) {
+	public ModelAndView getBoard(@PathVariable("boardNo") int boardNo,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount, HttpSession session, CommentDTO commentDTO) {
 		UserDTO loginUser = (UserDTO)session.getAttribute("loginUser");
 				
 		BoardDTO board = boardService.getBoard(boardNo);
@@ -188,6 +190,8 @@ public class BoardController {
 			mv.setViewName("board/getBoardN.html");			
 			mv.addObject("getBoard", boardDTO);
 			mv.addObject("boardFileList", boardFileDTOList);
+			mv.addObject("pageNum", pageNum);
+			mv.addObject("amount", amount);
 			
 			// 댓글
 			List<CommentDTO> comment = commentService.getComment(commentDTO);
@@ -201,6 +205,8 @@ public class BoardController {
 			mv.addObject("loginUser", loginUser);
 			mv.addObject("getBoard", boardDTO);
 			mv.addObject("boardFileList", boardFileDTOList);
+			mv.addObject("pageNum", pageNum);
+			mv.addObject("amount", amount);
 			
 			// 댓글
 			List<CommentDTO> comment = commentService.getComment(commentDTO);
@@ -220,7 +226,8 @@ public class BoardController {
 	
 	// 게시글 수정
 	@GetMapping("/updateBoard/{boardNo}")
-	public ModelAndView updateBoardView(@PathVariable("boardNo") int boardNo) {
+	public ModelAndView updateBoardView(@PathVariable("boardNo") int boardNo,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount) {
 		BoardDTO board = boardService.getBoard(boardNo);
 		
 		BoardDTO boardDTO = BoardDTO.builder()
@@ -254,6 +261,8 @@ public class BoardController {
 		mv.setViewName("board/updateBoard.html");
 		mv.addObject("getBoard", boardDTO);
 		mv.addObject("boardFileList", boardFileDTOList);
+		mv.addObject("pageNum", pageNum);
+		mv.addObject("amount", amount);
 		
 		return mv;
 	}
@@ -306,6 +315,7 @@ public class BoardController {
 	
 	@PostMapping("/updateBoard")
 	public void updateBoard(BoardDTO boardDTO,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 		BoardDTO board = BoardDTO.builder()
 								 .boardNo(boardDTO.getBoardNo())
@@ -318,7 +328,7 @@ public class BoardController {
 		
 		boardService.updateBoard(boardDTO);
 		
-		response.sendRedirect("board/" + board.getBoardNo());
+		response.sendRedirect("board/" + board.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
 	}
 	
 	// 파일 다운
@@ -344,55 +354,23 @@ public class BoardController {
 		return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
 	}
 	
-	// 목록 엑셀 다운로드
-//	@GetMapping("/excelDown")
-//	public void excelDownload(HttpServletResponse response) throws IOException {
-//		XSSFWorkbook wb = new XSSFWorkbook();
-//		Sheet sheet = wb.createSheet("mysheet이름");
-//		Row row = null;
-//		Cell cell = null;
-//				
-//		// row(행) 생성
-//		row = sheet.createRow(0); // 0번째 행
-//		cell = row.createCell(0);
-//		cell.setCellValue("0");
-//		cell = row.createCell(1);
-//		cell.setCellValue("가가가");
-//		cell = row.createCell(2);
-//		cell.setCellValue("나나나");
-//		
-//		row = sheet.createRow(1); // 1번째 행
-//		cell = row.createCell(0);
-//		cell.setCellValue("1");
-//		cell = row.createCell(1);
-//		cell.setCellValue("AAA");
-//		cell = row.createCell(2);
-//		cell.setCellValue("BBB");
-//		
-//		row = sheet.createRow(2); // 2번째 행
-//		cell = row.createCell(0);
-//		cell.setCellValue("2");
-//		cell = row.createCell(1);
-//		cell.setCellValue("aaa");
-//		cell = row.createCell(2);
-//		cell.setCellValue("bbb");
-//		
-//		// 컨텐츠 타입과 파일명 지정
-//		response.setContentType("ms-vnd/excel");
-//		response.setHeader("Content-Disposition", "attachment;filename=test01.xlsx"); // 파일이름 지정
-//		//response OutputStream에 엑셀 작성
-//		wb.write(response.getOutputStream());		
-//		
-//	}
-	
 	@GetMapping("/excelDown")
-	public void excelDownload(BoardDTO boardDTO, HttpServletResponse response) throws IOException {
+	public void excelDownload(BoardDTO boardDTO, HttpServletResponse response,
+			@RequestParam Map<String, String> paramMap, Criteria cri) throws IOException {
 		XSSFWorkbook wb = new XSSFWorkbook();
 		Sheet sheet = wb.createSheet("게시판 목록");
 		Row row = null;
 		Cell cell = null;
 		
-		List<BoardDTO> boardListDown = boardService.excelDown(boardDTO);
+		if(paramMap.get("searchCondition") != null && !paramMap.get("searchCondition").equals("")) {
+			paramMap.get("searchCondition");
+		}
+		
+		if(paramMap.get("searchKeyword") != null && !paramMap.get("searchKeyword").equals("")) {
+			paramMap.get("searchKeyword");
+		}		
+		
+		List<BoardDTO> boardListDown = boardService.excelDown(paramMap, cri);
 		
 		// 첫 행 열 이름 표기
 		int cellCount = 0;
@@ -406,7 +384,7 @@ public class BoardController {
 		cell = row.createCell(cellCount++);
 		cell.setCellValue("작성자");
 		cell = row.createCell(cellCount++);
-		cell.setCellValue("글 비밀번호(비회원시)");
+		cell.setCellValue("회원 구분");
 		cell = row.createCell(cellCount++);
 		cell.setCellValue("글 내용");
 		cell = row.createCell(cellCount++);
@@ -428,7 +406,7 @@ public class BoardController {
 			cell = row.createCell(cellCount++);
 			cell.setCellValue(boardListDown.get(i).getBoardWriter());
 			cell = row.createCell(cellCount++);
-			cell.setCellValue(boardListDown.get(i).getBoardPw());
+			cell.setCellValue(boardListDown.get(i).getUserYn());
 			cell = row.createCell(cellCount++);
 			cell.setCellValue(boardListDown.get(i).getBoardContent());
 			cell = row.createCell(cellCount++);

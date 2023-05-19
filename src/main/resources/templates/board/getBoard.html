@@ -11,12 +11,24 @@
 				 const fileNo = /*[[boardFileList.fileNo]]*/;
 				 const commNo = /*[[comment.commNo]]*/;
 				 const boardPw = /*[[getBoard.boardPw]]*/;
+				 const commGr = /*[[comment.commGr]]*/;
+				 const commOr = /*[[comment.commOr]]*/;
 				 $(function() {
-					 
+					
+					// 답글 글자 수 제한
+					 $(".replyContent").keyup(function(e) {
+						 text = $(this).val();
+						 
+						 if(text.length > 30) {
+							 $(this).val($(this).val().substring(0, 30));
+						 }
+					 });
+					
 				 });
 				 
-				 function fnBtnMoveList() {
-					 window.location.href = '/board/boardList'
+				 function fnBtnMoveList() {					 
+					 
+					 window.location.href = '/board/boardList?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
 				 }
 				 
 				 function fnBtnDelete() {
@@ -36,7 +48,7 @@
 					 })
 				 }
 				 
-				 function fnBtnModify() {
+				 function fnBtnModify() {					 
 					 
 					 if(boardPw == null) {
 						 $.ajax({
@@ -56,7 +68,7 @@
 									 return;
 								 }
 								 
-								 window.location.href = '/board/updateBoard/' + $("#boardNo").val();
+								 window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
 							 },
 							 error: function(e) {
 								 console.log(e);
@@ -64,7 +76,7 @@
 							 }
 					 	})
 				 	 } else {
-						  window.location.href = '/board/updateBoard/' + $("#boardNo").val();
+						  window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
 					  }
 					 
 					 
@@ -75,47 +87,156 @@
 					 window.location = "/board/fileDown?boardNo="
 					 			+ boardNo + "&fileNo=" + fileNo;
 				 }
-				 
-				 function fnBtnReply() {
+												 
+				 function fnBtnCommDel(commNo, commOr, commGr, boardNo) {					 
+					 let pageNum = document.getElementsByClassName("pageNum").value;
+					 let amount = document.getElementsByClassName("amount").value;
+					 
 					 $.ajax({
-						 url: '/board/insertReply',
-						 type: 'get',
+						 url: '/comment/replyCheck',
+						 type: 'post',
 						 data: {
+							 commNo: commNo,
+							 commOr: commOr,
+							 commGr: commGr,
 							 boardNo: boardNo
 						 },
-						 success: function() {
+						 success: function(obj) {
 							 
-							 window.location.href = '/board/insertReply'
+							 // 답글인지 확인
+							 if(obj.item.msg == "isReply") {
+								 console.log("답글입니다.");
+								 // 댓글 삭제
+								 $.ajax({
+									 url: '/comment/deleteComment',
+									 type: 'delete',
+									 data: {
+										 commNo: commNo
+									 },
+									 success: function() {
+										 alert("삭제되었습니다.");
+										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+									 },
+									 error: function(e) {
+										 console.log(e);
+									 }
+								 });
+								 
+							 } else if(obj.item.msg == "existReply") {								 
+								 console.log("답글 있음");
+								 // 삭제된 댓글이라고 댓글 내용 업데이트
+								 $.ajax({
+									 url: '/comment/updateComment',
+									 type: 'post',
+									 data: {
+										 commNo: commNo,
+										 boardNo: boardNo,
+										 pageNum: $(".pageNum").val(),
+										 amount: $(".amount").val()
+									 },
+									 success: function() {
+										 alert("삭제되었습니다.");
+										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+									 },
+									 error: function(request, status, error) {
+										 alert("code: " + request.status + "\n" + "message: " + request.responseText + "\n" + "error: " + error);
+									 }
+								 })
+								 
+							 } else if(obj.item.msg == "noReply") {
+								 // 댓글 삭제
+								 $.ajax({
+									 url: '/comment/deleteComment',
+									 type: 'delete',
+									 data: {
+										 commNo: commNo
+									 },
+									 success: function() {
+										 alert("삭제되었습니다.");
+										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+									 },
+									 error: function(e) {
+										 console.log(e);
+									 }
+								 });
+							 }
+							 
 						 },
-						 error: function(e) {
-							 console.log(e);
-						 }
-					 })
+						 fail: function(result) {
+								 console.log(result.responseText);
+								 fail(error);
+							 }
+					 });
+					 
 					 
 				 }
 				 
-				 function fnBtnCommDel(commNo) {
-					 $.ajax({
-						 url: '/comment/deleteComment',
-						 type: 'delete',
-						 data: {
-							 commNo: commNo
-						 },
-						 success: function() {
-							 alert("삭제되었습니다.");
-							 window.location.href = '/board/board/' + $("#boardNo").val();
-						 },
-						 error: function(e) {
-							 console.log(e);
-						 }
-					 })
+				 function fnBtnReply(commGr, commContent) {
+					 $(".reply").css("display", "block");
+					 
+					 // h3 태그 아래에 commContent 의 답글 이라고 표출
+					 const h3Tag = document.querySelector('.replyMent');
+					 
+					 var commM = document.createElement('input');
+					 commM.setAttribute('type', 'hidden');
+					 commM.setAttribute('name', 'commContent');
+					 commM.setAttribute('value', commContent);
+					 
+					 h3Tag.insertAdjacentElement('afterend', commM);
+					 
+					 const replyForm = document.querySelector(".replyForm");
+					 var oldSpan = document.querySelector(".replyComm");
+					 var truncatedText = commContent;
+					 
+					 if(commContent.length > 7) {
+						 truncatedText = '댓글 "' + commContent.substring(0, 7) + '..." 의 답글';
+					 } else {
+						 truncatedText = '댓글 "' + commContent + '" 의 답글';
+					 }
+					 
+					 if(oldSpan) {
+						 oldSpan.remove();
+					 }
+					 
+					 var spanTag = document.createElement('span');
+					 spanTag.setAttribute('class', 'replyComm');
+					 spanTag.textContent = truncatedText;
+					 
+					 replyForm.insertAdjacentElement('beforebegin', spanTag);
+					 
+					 
+					 const tag = document.querySelector('.btnReply');
+					 const btnTag = document.querySelector('#btnReplyDone');
+					 const oldNode = document.querySelector('.realCommGr');
+  
+					 if (oldNode) {
+					   oldNode.remove();
+					 }
+					 
+					 const newNode = document.createElement('input');
+					 newNode.setAttribute('type', 'hidden');
+					 newNode.setAttribute('name', 'commGr');
+					 newNode.setAttribute('class', 'realCommGr');
+					 newNode.setAttribute('value', commGr);
+					 
+					 btnTag.insertAdjacentElement('beforebegin', newNode);
 				 }
+				 
 			 </script>
 		 </th:block>
 		 <th:block layout:fragment="css">
-			 <style>
+			 <style>				 
+				 h3 {
+					display: inline-block;	 
+				 }
+				 
 				 .cate {
 					 margin-bottom: 16px;
+				 }
+				 
+				 #boardTitle {
+					 border: none;
+					 font-size: 0.98em;
 				 }
 				 
 				 #boardContent {
@@ -136,21 +257,32 @@
 					 width: 100%;
 					 height: 100%;
 					 z-index: none;
-					 /*cursor: pointer;*/
 				 }
 				 
 				 .fileNm {
 					 display: inline-block;
-					 font-size: 8px;
+					 font-size: 13px;
 					 cursor: pointer;
+					 margin: 0;					 
 				 }
 				 
 				 .downloadMent {
-					 font-size: 9px;
+					 font-size: 15px;
+					 margin: 0;
 				 }
 				 
 				 #btns {
 					 margin-top: 20px;
+				 }
+				 
+				 #btnList, #btnDelete, #btnModify {
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
 				 }
 				 
 				 .commT {
@@ -188,17 +320,22 @@
 					 text-align: center;
 				 }
 				 
-				 .btnCocomm {
-					 width: 10%;
-					 text-align: center;
+				 #btnCommDel:hover {
+					 color: white;
+					 background-color: black;
 				 }
-				 
+				 				 
 				 #btnCommDel {
 					 padding: 5px;
 					 border-radius: 10px;
 					 background-color: #F1F1F1;
 					 font-size: 0.9em;
 					 text-decoration: none;
+				 }
+				 
+				 .btnCocomm {
+					 width: 10%;
+					 text-align: center;
 				 }
 				 
 				 #btnCocomm {
@@ -209,11 +346,11 @@
 					 text-decoration: none;
 				 }
 				 
-				 .btnCommDel:hover {
-					 color: black;
-/*					 background-color: black;*/
-				 }
-				 
+				 #btnCocomm:hover {
+					 color: white;
+					 background-color: black;
+				 }	
+				 				 
 				 .commContentInsert {
 					 resize: none;
 					 border: 1px #E0E0E0 solid;
@@ -239,21 +376,55 @@
 				 }
 				 
 				 .commForm {
-					 margin-bottom: 10px;
+					 margin-bottom: 30px;
 				 }
 				 
 				 .wrapCommWriter {
 					 margin-bottom: 5px;
+				 }
+				 
+				 .reply {
+					 display: none;
+				 }
+				 
+				 .wrapReplyWriter {
+					 margin-bottom: 5px;
+				 }
+				 
+				 .replyContent {
+					 resize: none;
+					 border: 1px #E0E0E0 solid;
+					 border-radius: 10px;
+					 padding: 8px;
+					 width: 780px;
+				 }
+				 
+				 #btnReplyDone {
+					 position: relative;
+					 left: 725px;
+					 border: 1px #F1F1F1 solid;
+					 border-radius: 10px;
+					 background-color: #F1F1F1;
+					 padding: 5px;
+					 font-size: 0.9em;
+				 }
+				 
+				 #btnReplyDone:hover {
+					 cursor: pointer;
+					 color: #F1F1F1;
+					 background-color: black;
 				 }
 			 </style>
 		 </th:block>
 	 </head>
 	 <body
 		 <div layout:fragment="content">
-			 <div>
+			 <div id="container">
 				<h3>게시글 상세</h3>
 				<form id="boardForm">
 					<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
+					<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
+					<input type="hidden" name="amount" class="amount" th:value="${amount}"> 					
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
@@ -264,7 +435,7 @@
 					<p th:text="'조회수: ' + ${getBoard.boardCnt}"></p>
 					<textarea name="boardContent" id="boardContent" cols="50" rows="6" th:text="${getBoard.boardContent}" readonly></textarea>
 					<div id="filePreview">
-						<p th:if="${boardFileList.size > 0}" class="downloadMent">첨부파일명을 클릭하시면 다운로드 됩니다.</p>
+						<p th:if="${boardFileList.size > 0}" class="downloadMent">* 첨부파일명을 클릭하시면 다운로드 됩니다.</p>
 						<div id="attZone">
 							<div th:each="boardFile : ${boardFileList}" class="boardFileEach">
 								<input type="hidden" th:id="'fileNo' + ${boardFileStat.index}" 
@@ -287,53 +458,79 @@
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 160px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 220px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()" style="margin-left: 260px;">답글 쓰기</button>
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 210px;">삭제</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 270px;">삭제</button>
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 160px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 220px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
-						<button type="button" id="btnReply" onclick="fnBtnReply()">답글 쓰기</button>
 					</div>
 				</form>
 				<br><br><br>
 				
 				<h3>댓글</h3>
-				<table class="commT">
-					<tr th:each="comment : ${comment}" class="commentEach">			
-						<td id="commentTd" class="commWriter" th:if="${comment.commLv != 0}" th:text="'&rdca;&nbsp;' + ${comment.commWriter}"></td>
-						<td id="commentTd" class="commWriter" th:unless="${comment.commLv != 0}" th:text="${comment.commWriter}"></td>
-						<td id="commentTd" class="commContent" th:text="${comment.commContent}"></td>
-						<td id="commentTd" class="commRegdate" th:text="${#strings.substring(comment.commRegdate, 0, 10) + '&nbsp;' + #strings.substring(comment.commRegdate, 11, 19)}"></td>
-						<td id="commentTd" class="btnCommDel">
-							<input type="hidden" name="commNo" id="commNo" th:value="${comment.commNo}">
-							<a th:if="${loginUser.userId eq comment.commWriter || loginUser.userRole eq 'ADMIN'}" id="btnCommDel" href="javascript:void(0);" th:onclick="fnBtnCommDel([[${comment.commNo}]])">삭제</a>
-						</td>
-						<td id="commentTd" class="btnCocomm" th:if="${comment.commLv == 0}">
-							<a id="btnCocomm" href="javascript:void(0);" th:onclick="fnBtnCocomm()">대댓글</a>
-						</td>
-					</tr>
-				</table>
+				<form id="getCommForm">
+					<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
+					<table class="commT">
+						<tr th:each="comment : ${comment}" class="commentEach">			
+							<td id="commentTd" class="commWriter" th:if="${comment.commLv != 0}" th:text="'&rdca;&nbsp; [글쓴이] ' + ${comment.commWriter}"></td>
+							<td id="commentTd" class="commWriter" th:unless="${comment.commLv != 0}" th:text="${comment.commWriter}"></td>
+							<td id="commentTd" class="commContent" th:text="${comment.commContent}"></td>
+							<td id="commentTd" class="commRegdate" th:text="${#strings.substring(comment.commRegdate, 0, 10) + '&nbsp;' + #strings.substring(comment.commRegdate, 11, 19)}"></td>
+							<td id="commentTd" class="btnCommDel">
+								<input type="hidden" name="commNo" id="commNo" th:value="${comment.commNo}">
+								<input type="hidden" name="commOr" id="commOr" th:value="${comment.commOr}">
+								<input type="hidden" name="commDel" id="commDel" th:value="${comment.commDel}">
+								<a th:if="${comment.commDel eq 'N' && (loginUser.userId eq comment.commWriter || loginUser.userRole eq 'ADMIN')}" id="btnCommDel" href="javascript:void(0);" 
+									th:onclick="fnBtnCommDel([[${comment.commNo}]], [[${comment.commOr}]], [[${comment.commGr}]], [[${getBoard.boardNo}]])">삭제</a>
+							</td>
+							<td id="commentTd" class="btnCocomm" th:if="${comment.commLv == 0 && loginUser.userId == getBoard.boardWriter && comment.commDel eq 'N'}">
+								<input type="hidden" name="commGr" id="commGr" th:value="${comment.commGr}">
+								<a id="btnCocomm" href="javascript:void(0);" th:onclick="fnBtnReply([[${comment.commGr}]], [[${comment.commContent}]])">답글</a>
+							</td>
+						</tr>
+					</table>
+				</form>				
 				<br><br>
+				<div class="reply">
+					<h3 class="replyMent">답글 쓰기</h3>
+					<div class="replyForm">
+						<form action="/comment/insertReply" method="post">
+							<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
+							<input type="hidden" name="amount" class="amount" th:value="${amount}"> 							
+							<div class="wrapReplyWriter">
+								<label for="commWriter" id="replyWriter">작성자: </label><input type="text" name="commWriter" th:value="${getBoard.boardWriter}" readonly>
+							</div>
+							<div>
+								<textarea name="commContent" class="replyContent" rows="5" cols="50" required></textarea> 
+							</div>
+							<div class="btnReply">
+								<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
+								<button type="submit" id="btnReplyDone">답글 등록</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				
+				
 				<h3>댓글 쓰기</h3>
 				<div class="commForm">
 					<form action="/comment/insertComment" method="post">
+						<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
+						<input type="hidden" name="amount" class="amount" th:value="${amount}"> 	
 						<div class="wrapCommWriter">
 							<label for="commWriter" id="commWriter">작성자: </label><input type="text" name="commWriter" th:value="${loginUser.userId}" readonly>
 						</div>
 						<div>
-							<textarea name="commContent" class="commContentInsert" rows="5" cols="50"></textarea>
+							<textarea name="commContent" class="commContentInsert" rows="5" cols="50" required></textarea>
 						</div>
 						<div>
 							<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">

@@ -24,4 +24,5 @@ public class BoardDTO {
 	private String userRole;		// 유저롤
 	private String cateName;
 	private String fileOriName;
+	private String userYn;
 }

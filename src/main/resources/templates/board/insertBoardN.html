@@ -151,7 +151,7 @@
 					  
 					  // 파일명 표출할 p태그 생성
 					  const fName = document.createElement("p");
-					  fName.setAttribute("style", "display: inline-block; font-size: 8px;");
+					  fName.setAttribute("style", "display: inline-block; font-size: 13px;");
 					  fName.textContent = file.name;
 					  
 					  // div에 하나씩 추가
@@ -173,17 +173,62 @@
 					 margin: 0 auto;
 				 }
 				 
+				 #cateNo {
+					 font-size: 1em;
+					 height: 28px;
+				 }
+				 
+				 #boardTitle {
+					 font-size: 1.1em;
+				 }
+				 
+				 .writer {
+					 margin-top: 5px;
+					 margin-bottom: 5px;
+					 font-size: 1.1em;
+				 }
+				 
+				 .password {
+					 font-size: 1.1em;
+					 margin-bottom: 5px;
+				 }
+				 
+				 #boardPw {
+					 font-size: 1.1em;
+				 }
+				 
+				 #boardWriter {
+					 font-size: 1.1em;
+				 }
+				 
 				 #boardContent {
 					 resize: none;
 				 }
 				 
 				 #btns {
-					 margin-top: 20px;
+					 margin-top: 40px;
 					 margin-bottom: 50px;
 				 }
 				 
+				 #btnList, #btnDone {
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
+				 }
+				 
 				 #btnCancel {
-					 margin-left: 300px;
+					 margin-left: 230px;
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
 				 }
 			 </style>
 		 </th:block>
@@ -199,11 +244,11 @@
 						<option value="2">유머</option>
 					</select>
 					<input type="text" name="boardTitle" id="boardTitle" placeholder="제목" required><br>
-					<div>
+					<div class="writer">
 						<label for="userId" id="userId">작성자: </label>
 						<input type="text" name="boardWriter" id="boardWriter" required> 						
 					</div>
-					<div>
+					<div class="password">
 						<lable for="boardPw">비밀번호: </lable>
 						<input type="password" name="boardPw" id="boardPw" required>
 					</div>

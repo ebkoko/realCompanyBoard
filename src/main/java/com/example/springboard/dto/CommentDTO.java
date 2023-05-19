@@ -18,4 +18,5 @@ public class CommentDTO {
 	private String commWriter;	// 댓글 작성자
 	private String commContent;	// 댓글 내용
 	private String commRegdate;	// 댓글 작성일
+	private String commDel;		// 댓글 삭제여부(원댓)
 }

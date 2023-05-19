@@ -98,8 +98,20 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 	@Override
-	public List<BoardDTO> excelDown(BoardDTO boardDTO) {
-		return boardMapper.excelDown(boardDTO);
+	public List<BoardDTO> excelDown(@RequestParam Map<String, String> paramMap, Criteria cri) {
+		Map<String, Object> pMap = new HashMap<String, Object>();
+		
+		pMap.put("boardSearch", paramMap);
+
+		cri.setStartNum((cri.getPageNum() - 1) * cri.getAmount());
+		pMap.put("cri", cri);
+		
+		return boardMapper.excelDown(pMap);
 		
 	}
+	
+//	@Override
+//	public List<BoardDTO> excelDown(BoardDTO boardDTO) {
+//		return boardMapper.excelDown(boardDTO);
+//	}
 }

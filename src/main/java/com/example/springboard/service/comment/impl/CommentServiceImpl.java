@@ -32,4 +32,19 @@ public class CommentServiceImpl implements CommentService {
 	public void deleteComment(int commNo) {
 		commentMapper.deleteComment(commNo);
 	}
+	
+	@Override
+	public void insertReply(CommentDTO commentDTO) {
+		commentMapper.insertReply(commentDTO);
+	}
+	
+	@Override
+	public int replyCheck(CommentDTO commentDTO) {
+		return commentMapper.replyCheck(commentDTO);
+	}
+	
+	@Override
+	public void updateComm(CommentDTO commentDTO) {
+		commentMapper.updateComm(commentDTO);
+	}
 }

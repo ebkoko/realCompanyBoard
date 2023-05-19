@@ -19,9 +19,20 @@
 
 #loginForm input {
 	width: 100%;
+	font-size: 1.1em;
 }
 
 .btn-wrapper {
 	display: block;
 	margin: 20px auto;
+}
+
+#btnLogin {
+	padding: 8px;
+	border-radius: 10px;
+	background-color: #DCDCDC;
+	border-width: 0;
+	font-size: 1em;
+	font-weight: 600;
+	cursor: pointer;
 }

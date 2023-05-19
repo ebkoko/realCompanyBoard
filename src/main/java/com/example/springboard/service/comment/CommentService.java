@@ -11,4 +11,10 @@ public interface CommentService {
 //	List<CommentDTO> getComment(int boardNo);
 	
 	void deleteComment(int commNo);
+	
+	void insertReply(CommentDTO commentDTO);
+	
+	int replyCheck(CommentDTO commentDTO);
+	
+	void updateComm(CommentDTO commentDTO);
 }

@@ -1,20 +1,25 @@
 package com.example.springboard.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.springboard.dto.CommentDTO;
+import com.example.springboard.dto.ResponseDTO;
 import com.example.springboard.service.comment.CommentService;
 
 @RestController
@@ -49,16 +54,90 @@ public class CommentController {
 	// 댓글 작성
 	@RequestMapping("/insertComment")
 	public void insertComment(CommentDTO commentDTO,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 		commentService.insertComment(commentDTO);
 		
-		response.sendRedirect("/board/board/" + commentDTO.getBoardNo()); 
+		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount); 
 	}
 	
 	// 댓글 삭제
 	@DeleteMapping("/deleteComment")
 	public void deleteComment(@RequestParam("commNo") int commNo) {
 		commentService.deleteComment(commNo);
+		
+	}
+	
+	@PostMapping("/replyCheck")
+	public ResponseEntity<?> replyCheck(@RequestParam("commNo") int commNo, @RequestParam("commOr") int commOr,
+			@RequestParam("commGr") int commGr, @RequestParam("boardNo") int boardNo, CommentDTO commentDTO) {
+		ResponseDTO<Map<String, String>> responseDTO = new ResponseDTO<>();
+		Map<String, String> returnMap = new HashMap<String, String>();
+		
+		try {			
+			int checkedReply = commentService.replyCheck(commentDTO);
+			
+			// 댓글인지 답글인지 확인(댓글: 0, 답글: 1)
+			if(commOr != 0) {
+				System.out.println("commOr 1임 이게 답글임--" + commOr);
+				returnMap.put("msg", "isReply");
+			} else {
+				System.out.println("commOr 0임 그냥 댓글임--" + commOr);
+				
+				// 답글 있는지 확인(답글이 있으면 checkedReply > 1)
+				if(checkedReply > 1) {
+					System.out.println("원댓이고 답글 있음 checkeReply: " + checkedReply);
+					System.out.println("commGr: " + commGr);
+					returnMap.put("msg", "existReply");
+					
+				} else {
+					System.out.println("원댓이고 답글 없음 checkedReply: " + checkedReply + ", boardNo: " + boardNo);
+					System.out.println("commGr: " + commGr + ", commNo: " + commNo);
+					returnMap.put("msg", "noReply");
+				}
+			}
+			
+			responseDTO.setItem(returnMap);
+			
+			return ResponseEntity.ok().body(responseDTO);
+		} catch(Exception e) {
+			responseDTO.setErrorMessage(e.getMessage());
+			return ResponseEntity.badRequest().body(responseDTO);
+		}
+	}
+	
+	
+	@PostMapping("/updateComment")
+	public void updateComment(@RequestParam("commNo") int commNo, CommentDTO commentDTO,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			HttpServletResponse response, HttpServletRequest request) throws IOException {
+		System.out.println("컨트롤ㄹ러--------");
+		CommentDTO updateComm = CommentDTO.builder()
+											.boardNo(commentDTO.getBoardNo())
+											.commNo(commNo)
+											.commLv(commentDTO.getCommLv())
+											.commOr(commentDTO.getCommOr())
+											.commGr(commentDTO.getCommGr())
+											.commWriter(commentDTO.getCommWriter())
+											.commContent(commentDTO.getCommContent())
+											.commRegdate(commentDTO.getCommRegdate())
+											.commDel(commentDTO.getCommDel())
+											.build();
+		
+		commentService.updateComm(commentDTO);
+
+		response.sendRedirect("/board/board/" + updateComm.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
+	}
+	
+	
+	// 답글 작성
+	@RequestMapping("/insertReply")
+	public void insertReply(CommentDTO commentDTO,
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			HttpServletResponse response, HttpServletRequest request) throws IOException {
+		commentService.insertReply(commentDTO);
+		
+		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
 	}
 	
 }

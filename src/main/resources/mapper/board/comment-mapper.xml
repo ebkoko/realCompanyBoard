@@ -12,7 +12,8 @@
 			COMM_GR,
 			COMM_WRITER,
 			COMM_CONTENT,
-			COMM_REGDATE
+			COMM_REGDATE,
+			COMM_DEL
 		) VALUES (
 			#{boardNo},
 			(
@@ -20,10 +21,13 @@
 			),
 			0,
 			0,
-			0,
+			(
+				SELECT IFNULL(MAX(C.COMM_GR), 0) + 1 FROM T_SB_COMMENT C
+			),
 			#{commWriter},
 			#{commContent},
-			now()
+			now(),
+			'N'
 		)
 	</insert>
 	
@@ -37,4 +41,47 @@
 	<delete id="deleteComment" parameterType="int">
 		DELETE FROM T_SB_COMMENT WHERE COMM_NO = #{commNo}
 	</delete>
+	
+	<insert id="insertReply" parameterType="comment">
+		INSERT INTO T_SB_COMMENT(
+			BOARD_NO,
+			COMM_NO,
+			COMM_LV,
+			COMM_OR,
+			COMM_GR,
+			COMM_WRITER,
+			COMM_CONTENT,
+			COMM_REGDATE,
+			COMM_DEL
+		) VALUES (
+			#{boardNo},
+			(
+				SELECT IFNULL(MAX(C.COMM_NO), 0) + 1 FROM T_SB_COMMENT C
+			),
+			1,
+			(
+				SELECT IFNULL(MAX(C.COMM_OR), 0) + 1 FROM T_SB_COMMENT C
+			),
+			#{commGr},
+			#{commWriter},
+			#{commContent},
+			now(),
+			'N'
+		)
+	</insert>
+	
+	<select id="replyCheck" parameterType="comment" resultType="int">
+		SELECT
+			COUNT(C.COMM_GR)
+		FROM T_SB_COMMENT C
+		WHERE C.BOARD_NO = #{boardNo}
+		AND C.COMM_GR = #{commGr} 
+	</select>
+	
+	<update id="updateComm" parameterType="comment">
+		UPDATE T_SB_COMMENT
+			SET COMM_CONTENT = '삭제된 댓글입니다.',
+				COMM_DEL = 'Y'
+		WHERE COMM_NO = #{commNo}
+	</update>
 </mapper>
