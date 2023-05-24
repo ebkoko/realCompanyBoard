@@ -33,7 +33,7 @@
 			SET BOARD_CNT = BOARD_CNT + 1
 			WHERE BOARD_NO = #{boardNo}
 	</update>
-	
+<!--	
 	<select id="getBoardList" parameterType="map" resultType="board">
 	<![CDATA[ 
 		SELECT 
@@ -77,7 +77,55 @@
 	]]>
 		LIMIT #{cri.amount} OFFSET #{cri.startNum} 
 	</select>
+	-->
 	
+	<select id="getBoardList" parameterType="map" resultType="board">
+	<![CDATA[ 
+		SELECT 
+			B.BOARD_NO,
+			B.CATE_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_WRITER,
+	        B.BOARD_PW,
+	        B.BOARD_REGDATE,
+	        B.BOARD_CNT,
+	        COUNT(F.FILE_NO) FILE_NO_CNT,
+	        U.USER_ROLE
+		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_FILE F
+	    ON B.BOARD_NO = F.BOARD_NO
+	    LEFT OUTER JOIN T_SB_USER U
+	    ON B.BOARD_WRITER = U.USER_ID
+	]]>	
+		<if test="boardSearch.searchKeyword != null and boardSearch.searchKeyword != ''">
+		    <if test="boardSearch.searchCondition == 'ALL'">
+		        WHERE 1 = 0
+		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		    </if>
+		    <if test="boardSearch.searchCondition != 'ALL'">
+		        WHERE 1 = 1
+		        <if test="boardSearch.searchCondition == 'TITLE'">
+		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="boardSearch.searchCondition == 'CONTENT'">
+		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="boardSearch.searchCondition == 'WRITER'">
+		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		    </if>
+		</if>
+	<![CDATA[ 
+		GROUP BY B.BOARD_NO
+	    ORDER BY B.BOARD_NO DESC
+	]]>
+		LIMIT #{cri.amount} OFFSET #{cri.startNum} 
+	</select>
+
+
+
+	<!--
 	<select id="getBoardTotalCnt" parameterType="map" resultType="int">
 		SELECT COUNT(*) FROM T_SB_BOARD
 		<if test="searchKeyword != null and searchKeyword != ''">
@@ -101,6 +149,35 @@
 			</if>
 		</if>
 	</select>
+	-->
+	
+	
+	<select id="getBoardTotalCnt" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM T_SB_BOARD
+		<if test="searchKeyword != null and searchKeyword != ''">
+		    <if test="searchCondition == 'ALL'">
+		        WHERE 1 = 0
+		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		    </if>
+		    <if test="searchCondition != 'ALL'">
+		        WHERE 1 = 1
+		        <if test="searchCondition == 'TITLE'">
+		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="searchCondition == 'CONTENT'">
+		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="searchCondition == 'WRITER'">
+		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		    </if>
+		</if>
+	</select>
+	
+	
+	
 	
 	<select id="getBoard" parameterType="int" resultType="board">
 		SELECT * FROM T_SB_BOARD

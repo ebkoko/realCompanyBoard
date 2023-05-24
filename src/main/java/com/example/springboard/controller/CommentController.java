@@ -79,20 +79,16 @@ public class CommentController {
 			
 			// 댓글인지 답글인지 확인(댓글: 0, 답글: 1)
 			if(commOr != 0) {
-				System.out.println("commOr 1임 이게 답글임--" + commOr);
 				returnMap.put("msg", "isReply");
 			} else {
-				System.out.println("commOr 0임 그냥 댓글임--" + commOr);
 				
 				// 답글 있는지 확인(답글이 있으면 checkedReply > 1)
 				if(checkedReply > 1) {
-					System.out.println("원댓이고 답글 있음 checkeReply: " + checkedReply);
-					System.out.println("commGr: " + commGr);
+										
 					returnMap.put("msg", "existReply");
 					
 				} else {
-					System.out.println("원댓이고 답글 없음 checkedReply: " + checkedReply + ", boardNo: " + boardNo);
-					System.out.println("commGr: " + commGr + ", commNo: " + commNo);
+					
 					returnMap.put("msg", "noReply");
 				}
 			}
@@ -111,7 +107,7 @@ public class CommentController {
 	public void updateComment(@RequestParam("commNo") int commNo, CommentDTO commentDTO,
 			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
-		System.out.println("컨트롤ㄹ러--------");
+
 		CommentDTO updateComm = CommentDTO.builder()
 											.boardNo(commentDTO.getBoardNo())
 											.commNo(commNo)

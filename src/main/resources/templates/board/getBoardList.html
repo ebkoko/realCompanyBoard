@@ -11,6 +11,7 @@
 				 const startNum = /*[[${pageDTO.cri.startNum}]]*/;
 				 const endPage = /*[[${pageDTO.displayPageNum}]]*/;
 				 $(function() {
+					 
 					 $(".pagination a").on("click", function(e) {
 						 e.preventDefault();
 						 
@@ -20,9 +21,31 @@
 					 })
 					 
 					 $("#btnSearch").on("click", function() {
-						 $("#input[name='pageNum']").val(1);
+						 var searchKeyword = $("input[name='searchKeyword']").val();
+						 var trimedKeyword = "";
+						 						 
+						 $("input[name='pageNum']").val(1);
+						 trimedKeyword = searchKeyword.trim();
+						 $("input[name='searchKeyword']").val(trimedKeyword);
 						 $("#searchForm").submit();
 					 })
+					 
+					 $(document).ready(function() {
+					    $("#categorySelect").change(function() {
+					        var selectedValue = $(this).val(); // 선택된 값 가져오기
+					
+					        $("#boardTable tr").each(function() {
+					            var category = $(this).find(".category").text();
+					
+					            if (selectedValue === "전체" || selectedValue === category) {
+					                $(this).show();
+					            } else {
+					                $(this).hide();
+					            }
+					        });
+					    });
+					});
+					 
 					 
 					 var actionForm = $("#actionForm");
 					 
@@ -66,7 +89,7 @@
 				 .wrapper {
 					 width: 100%;
 					 text-align: center;
-					 height: 450px;
+					 height: 500px;
 				 }
 				 
 				 #btnWrite {
@@ -197,11 +220,11 @@
 	 <body
 		 <div layout:fragment="content">
 			 <div class="wrapper">
-				 <div class="topMent">
-					 <h3>게시글 목록</h3>
-					 <a th:href="@{/board/insertBoard}" id="btnWrite">새 글 작성</a>					 
-				 </div>
 				 <div class="tableWrap">
+					 <div class="topMent">
+						 <h3>게시글 목록</h3>
+						 <a th:href="@{/board/insertBoard}" id="btnWrite">새 글 작성</a>					 
+					 </div>
 					 <form id="searchForm" action="/board/boardList" method="post">
 						 <input type="hidden" name="pageNum" th:value="${pageDTO.cri.pageNum}">
 						 <input type="hidden" name="amount" th:value="${pageDTO.cri.amount}"> 
@@ -224,12 +247,19 @@
 					 </form>
 					 <form class="excelDown" action="/board/excelDown" method="get">
 						 <button type="button" id="btnExcel">엑셀 다운로드</button>
-<!--						 <a th:href="@{'/board/excelDown'}" class="btnExcel" target="_blank" id="excelDown">엑셀 다운로드</a> -->
 					 </form>
 					 <table id="boardTable">
 						 <tr>
 							 <th class="boardNo">글 번호</th>
-							 <th class="category">글 종류</th>
+							 <th class="category">
+					            <select id="categorySelect">
+					                <option selected disabled>글 종류</option>
+					                <option value="전체">전체</option>
+					                <option value="0">공지</option>
+					                <option value="1">뉴스</option>
+					                <option value="2">유머</option>
+					            </select>
+					        </th>
 							 <th class="boardTitle">글 제목</th>
 							 <th class="fileCnt">첨부파일(개수)</th>
 							 <th class="boardWriter">작성자</th>

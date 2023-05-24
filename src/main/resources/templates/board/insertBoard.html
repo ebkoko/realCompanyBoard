@@ -25,7 +25,9 @@
 						for(f of fileArr) {
 							imageLoader(f);
 						} 
-					 });
+						
+				 	 });
+				 	 
 					 
 					 $("#insertForm").on("submit", function() {
 						// btnAtt에 uploadFiles에 있는 파일들을 담아준다.
@@ -37,6 +39,19 @@
 						} 
 						
 						$("#btnAtt")[0].files = dt.files;
+					 });
+					 
+				 	 // 제목 공백 미허용
+				  	 const boardTitleInput = document.getElementById("boardTitle");
+
+					 boardTitleInput.addEventListener("input", function() {
+					    const value = this.value.trim(); // 입력된 값에서 양쪽 공백 제거
+					
+					    if (value === "") {
+					      this.setCustomValidity("공백은 입력할 수 없습니다."); // 유효성 검사 실패 시 메시지 설정
+					    } else {
+					      this.setCustomValidity(""); // 유효성 검사 성공 시 메시지 초기화
+					    }
 					 });
 					 
 					 // 제목 글자 수 제한
@@ -151,7 +166,7 @@
 					  
 					  // 파일명 표출할 p태그 생성
 					  const fName = document.createElement("p");
-					  fName.setAttribute("style", "display: inline-block; font-size: 8px;");
+					  fName.setAttribute("style", "display: inline-block; font-size: 13px;");
 					  fName.textContent = file.name;
 					  
 					  // div에 하나씩 추가
@@ -173,17 +188,53 @@
 					 margin: 0 auto;
 				 }
 				 
+				 #cateNo {
+					 font-size: 1em;
+					 height: 28px;
+				 }
+				 
+				 #boardTitle {
+					 font-size: 1.1em;
+				 }
+				 
+				 .writer {
+					 margin-top: 5px;
+					 margin-bottom: 5px;
+					 font-size: 1.1em;
+				 }
+				 
+				 #boardWriter {
+					 font-size: 1.1em;
+				 }
+				 
 				 #boardContent {
 					 resize: none;
 				 }
 				 
 				 #btns {
-					 margin-top: 20px;
+					 margin-top: 40px;
 					 margin-bottom: 50px;
 				 }
 				 
+				 #btnList, #btnDone {
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
+				 }
+				 
 				 #btnCancel {
-					 margin-left: 300px;
+					 margin-left: 430px;
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
 				 }
 			 </style>
 		 </th:block>
@@ -200,12 +251,12 @@
 						<option value="2">유머</option>
 					</select>
 					<input type="text" name="boardTitle" id="boardTitle" placeholder="제목" required><br>
-					<div>
+					<div class="writer">
 						<label for="userId" id="userId">작성자: </label>
 	  					<input type="text" name="boardWriter" id="boardWriter" 
 							th:if="${loginUser.userId != null}" th:value="${loginUser.userId}" readonly> 						
 					</div>
-					<textarea name="boardContent" id="boardContent" cols="50" rows="6" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
+					<textarea name="boardContent" id="boardContent" cols="80" rows="20" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
 					<div id="filePreview">
 						<input type="file" name="uploadFiles" id="btnAtt" multiple="multiple">
 						<div id="attZone" data-placeholder="파일선택 버튼을 눌러 파일을 첨부하세요."></div>

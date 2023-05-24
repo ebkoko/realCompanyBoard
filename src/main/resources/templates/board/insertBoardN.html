@@ -64,7 +64,7 @@
 						 
 						 if(text.length == 0 || text.length == '') {
 							 $(".textCnt").text(0);
-						 } else {
+						 } else {`ㅂ
 							 $(".textCnt").text(totalByte);
 						 }
 						 
@@ -72,6 +72,63 @@
 							 $(this).val($(this).val().substring(0, 1000))
 						 }
 					 })
+					 
+					 // chatGPT
+//				 	 function checkTextareaByte() {
+//					 	var textarea = document.getElementById("myTextarea");
+//					 	var text = textarea.value;
+//					 	var byteCount = calculateByteCount(text);
+					  
+//					 	if (byteCount > 1000) {
+//					    	alert("입력 가능한 최대 글자 수를 초과하였습니다.");
+//					    	textarea.value = text.substring(0, calculateMaxTextLength(text, 1000));
+//					  	}
+//					 }
+					
+//					 function calculateByteCount(text) {
+//					 	var byteCount = 0;
+					  
+//					 	for (var i = 0; i < text.length; i++) {
+//					    	var charCode = text.charCodeAt(i);
+//					    	byteCount += (charCode > 128) ? 2 : 1;
+//					  	}
+					  
+//					 	return byteCount;
+//					 }
+					
+//					 function calculateMaxTextLength(text, maxByte) {
+//					 	var truncatedLength = 0;
+//					 	var byteCount = 0;
+					  
+//					 	for (var i = 0; i < text.length; i++) {
+//					    	var charCode = text.charCodeAt(i);
+//					    	byteCount += (charCode > 128) ? 2 : 1;
+					    
+//					    	if (byteCount > maxByte) {
+//					      		break;
+//					    	}
+					    
+//					    	truncatedLength++;
+//					  	}
+					  
+//					 	return truncatedLength;
+//					 }
+					 
+					 
+					 
+					// 제목 공백 미허용
+				    const boardTitleInput = document.getElementById("boardTitle");
+
+					  boardTitleInput.addEventListener("input", function() {
+					    const value = this.value.trim(); // 입력된 값에서 양쪽 공백 제거
+					
+					    if (value === "") {
+					      this.setCustomValidity("공백은 입력할 수 없습니다."); // 유효성 검사 실패 시 메시지 설정
+					    } else {
+					      this.setCustomValidity(""); // 유효성 검사 성공 시 메시지 초기화
+					    }
+					  });
+					
 				 });
 				 
 				 // 미리보기 영역에 들어갈 img태그 생성 및 선택된 파일을 Base64 인코딩된 문자열 형태로 미리보기 가능하게 해줌
@@ -221,7 +278,7 @@
 				 }
 				 
 				 #btnCancel {
-					 margin-left: 230px;
+					 margin-left: 430px;
 					 padding: 8px;
 					 border-radius: 10px;
 					 background-color: #DCDCDC;
@@ -252,7 +309,7 @@
 						<lable for="boardPw">비밀번호: </lable>
 						<input type="password" name="boardPw" id="boardPw" required>
 					</div>
-					<textarea name="boardContent" id="boardContent" cols="50" rows="6" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
+					<textarea name="boardContent" id="boardContent" cols="80" rows="20" required></textarea>(<span class="textCnt">0</span>/<span class="textTotal">1000</span>)
 					<div id="filePreview">
 						<input type="file" name="uploadFiles" id="btnAtt" multiple="multiple">
 						<div id="attZone" data-placeholder="파일선택 버튼을 눌러 파일을 첨부하세요."></div>

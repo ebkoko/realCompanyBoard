@@ -2,6 +2,7 @@ package com.example.springboard.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,8 +132,11 @@ public class BoardController {
 		
 		
 		boardService.insertBoard(boardDTO, uploadFileList);
-		
-		response.sendRedirect("/board/boardList");
+				
+		response.setContentType("text/html; charset=UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+		out.println("<script>alert('게시글이 등록되었습니다.'); window.location.href='/board/boardList';</script>");	
 	}
 	
 	// 조회수 증가
@@ -328,7 +332,12 @@ public class BoardController {
 		
 		boardService.updateBoard(boardDTO);
 		
-		response.sendRedirect("board/" + board.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
+		response.setContentType("text/html; charset=UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		PrintWriter out = response.getWriter();
+		out.println("<script>alert('게시글이 수정되었습니다.'); window.location.href='board/"
+				+ board.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "';</script>");
+		
 	}
 	
 	// 파일 다운

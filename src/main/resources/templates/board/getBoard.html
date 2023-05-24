@@ -32,20 +32,27 @@
 				 }
 				 
 				 function fnBtnDelete() {
-					 $.ajax({
-						 url: '/board/board',
-						 type: 'delete',
-						 data: {
-							 boardNo: $("#boardNo").val()
-						 },
-						 success: function() {
-							 alert("삭제되었습니다.");
-							 window.location.href = '/board/boardList'
-						 },
-						 error: function(e) {
-							 console.log(e);
-						 }
-					 })
+					 if(confirm("삭제하시겠습니까?")) {
+						 
+						$.ajax({
+							 url: '/board/board',
+							 type: 'delete',
+							 data: {
+								 boardNo: $("#boardNo").val()
+							 },
+							 success: function() {
+								 alert("삭제되었습니다.");
+								 window.location.href = '/board/boardList'
+							 },
+							 error: function(e) {
+								 console.log(e);
+							 }
+						 }) 
+						 
+					 } else {
+						 return;
+					 }
+					 
 				 }
 				 
 				 function fnBtnModify() {					 
@@ -92,82 +99,87 @@
 					 let pageNum = document.getElementsByClassName("pageNum").value;
 					 let amount = document.getElementsByClassName("amount").value;
 					 
-					 $.ajax({
-						 url: '/comment/replyCheck',
-						 type: 'post',
-						 data: {
-							 commNo: commNo,
-							 commOr: commOr,
-							 commGr: commGr,
-							 boardNo: boardNo
-						 },
-						 success: function(obj) {
-							 
-							 // 답글인지 확인
-							 if(obj.item.msg == "isReply") {
-								 console.log("답글입니다.");
-								 // 댓글 삭제
-								 $.ajax({
-									 url: '/comment/deleteComment',
-									 type: 'delete',
-									 data: {
-										 commNo: commNo
-									 },
-									 success: function() {
-										 alert("삭제되었습니다.");
-										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
-									 },
-									 error: function(e) {
-										 console.log(e);
-									 }
-								 });
+					 if(confirm("삭제하시겠습니까?")) {
+						 
+						 $.ajax({
+							 url: '/comment/replyCheck',
+							 type: 'post',
+							 data: {
+								 commNo: commNo,
+								 commOr: commOr,
+								 commGr: commGr,
+								 boardNo: boardNo
+							 },
+							 success: function(obj) {
 								 
-							 } else if(obj.item.msg == "existReply") {								 
-								 console.log("답글 있음");
-								 // 삭제된 댓글이라고 댓글 내용 업데이트
-								 $.ajax({
-									 url: '/comment/updateComment',
-									 type: 'post',
-									 data: {
-										 commNo: commNo,
-										 boardNo: boardNo,
-										 pageNum: $(".pageNum").val(),
-										 amount: $(".amount").val()
-									 },
-									 success: function() {
-										 alert("삭제되었습니다.");
-										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
-									 },
-									 error: function(request, status, error) {
-										 alert("code: " + request.status + "\n" + "message: " + request.responseText + "\n" + "error: " + error);
-									 }
-								 })
+								 // 답글인지 확인
+								 if(obj.item.msg == "isReply") {
+									 console.log("답글입니다.");
+									 // 댓글 삭제
+									 $.ajax({
+										 url: '/comment/deleteComment',
+										 type: 'delete',
+										 data: {
+											 commNo: commNo
+										 },
+										 success: function() {
+											 alert("삭제되었습니다.");
+											 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+										 },
+										 error: function(e) {
+											 console.log(e);
+										 }
+									 });
+									 
+								 } else if(obj.item.msg == "existReply") {								 
+									 console.log("답글 있음");
+									 // 삭제된 댓글이라고 댓글 내용 업데이트
+									 $.ajax({
+										 url: '/comment/updateComment',
+										 type: 'post',
+										 data: {
+											 commNo: commNo,
+											 boardNo: boardNo,
+											 pageNum: $(".pageNum").val(),
+											 amount: $(".amount").val()
+										 },
+										 success: function() {
+											 alert("삭제되었습니다.");
+											 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+										 },
+										 error: function(request, status, error) {
+											 alert("code: " + request.status + "\n" + "message: " + request.responseText + "\n" + "error: " + error);
+										 }
+									 })
+									 
+								 } else if(obj.item.msg == "noReply") {
+									 // 댓글 삭제
+									 $.ajax({
+										 url: '/comment/deleteComment',
+										 type: 'delete',
+										 data: {
+											 commNo: commNo
+										 },
+										 success: function() {
+											 alert("삭제되었습니다.");
+											 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+										 },
+										 error: function(e) {
+											 console.log(e);
+										 }
+									 });
+								 }
 								 
-							 } else if(obj.item.msg == "noReply") {
-								 // 댓글 삭제
-								 $.ajax({
-									 url: '/comment/deleteComment',
-									 type: 'delete',
-									 data: {
-										 commNo: commNo
-									 },
-									 success: function() {
-										 alert("삭제되었습니다.");
-										 window.location.href = '/board/board/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
-									 },
-									 error: function(e) {
-										 console.log(e);
-									 }
-								 });
-							 }
-							 
-						 },
-						 fail: function(result) {
-								 console.log(result.responseText);
-								 fail(error);
-							 }
-					 });
-					 
+							 },
+							 fail: function(result) {
+									 console.log(result.responseText);
+									 fail(error);
+								 }
+						 });
+						 
+					 } else {
+						 return;
+					 }
 					 
 				 }
 				 
@@ -428,12 +440,12 @@
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
-					<span>제목: </span><input type="text" name="boardTitle" id="boardTitle" th:value="${getBoard.boardTitle}" readonly><br>
+					<span>제목: </span><span id="boardTitle" th:text="${getBoard.boardTitle}"></span><br>
 					<p th:if="${getBoard.boardPw == null}" th:text="'작성자: ' + ${getBoard.boardWriter}"></p>
 					<p th:unless="${getBoard.boardPw == null}" th:text="'작성자: [비회원]' + ${getBoard.boardWriter}"></p>
 					<p th:text="${'작성일: ' + #strings.substring(getBoard.boardRegdate, 0, 10) + '&nbsp;' + #strings.substring(getBoard.boardRegdate, 11, 19)}"></p>
 					<p th:text="'조회수: ' + ${getBoard.boardCnt}"></p>
-					<textarea name="boardContent" id="boardContent" cols="50" rows="6" th:text="${getBoard.boardContent}" readonly></textarea>
+					<textarea name="boardContent" id="boardContent" cols="80" rows="20" th:text="${getBoard.boardContent}" readonly></textarea>
 					<div id="filePreview">
 						<p th:if="${boardFileList.size > 0}" class="downloadMent">* 첨부파일명을 클릭하시면 다운로드 됩니다.</p>
 						<div id="attZone">
@@ -458,7 +470,7 @@
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 220px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 430px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'NORMAL'}" id="btns">
@@ -466,11 +478,11 @@
 					</div>
 					<div th:if="${loginUser.userId ne getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 270px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 485px;">삭제</button>
 					</div>
 					<div th:if="${loginUser.userId eq getBoard.boardWriter && loginUser.userRole eq 'ADMIN'}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 220px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 430px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 					</div>
 				</form>

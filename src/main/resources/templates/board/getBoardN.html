@@ -28,6 +28,30 @@
 					 window.location.href = '/board/boardList?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
 				 }
 				 
+				 
+//				 function fnBtnMoveList() {
+//				    var pageNum = $(".pageNum").val();
+//				    var amount = $(".amount").val();
+				
+//				    $.ajax({
+//				        type: "GET",
+//				        url: "/board/boardList",
+//				        data: {
+//				            pageNum: pageNum,
+//				            amount: amount
+//				        },
+//				        success: function() {
+				            // 서버 응답에 따른 처리 작성
+//				            window.location.href = '/board/boardList';
+//				        },
+//				        error: function() {
+				            // 에러 처리 작성
+//				        }
+//				    });
+//				}
+
+				 
+				 
 				 function fnBtnDelete() {					 
 					 $.ajax({
 						 url: '/board/pwCheck',
@@ -43,22 +67,32 @@
 							 } else if(obj.item.msg == "boardNoDiff") {
 								 alert("게시글 번호가 맞지않습니다.");
 								 return;
+							 } else if(obj.item.msg == "boardPwSuccess") {
+								 if(confirm("게시글을 삭제하시겠습니까?")) {
+									 
+									 $.ajax({
+										 url: '/board/board',
+										 type: 'delete',
+										 data: {
+											 boardNo: $("#boardNo").val()
+										 },
+										 success: function() {
+											 alert("삭제되었습니다.");
+											 window.location.href = '/board/boardList'
+										 },
+										 error: function(e) {
+											 console.log(e);
+										 }
+									 })
+									 
+								 } else {
+									 $("#boardPw").val('');
+									 return;									 
+								 }
+								 
 							 }
 							 
-							 $.ajax({
-								 url: '/board/board',
-								 type: 'delete',
-								 data: {
-									 boardNo: $("#boardNo").val()
-								 },
-								 success: function() {
-									 alert("삭제되었습니다.");
-									 window.location.href = '/board/boardList'
-								 },
-								 error: function(e) {
-									 console.log(e);
-								 }
-							 })
+							 
 						
 						 },
 						 fail: function(result) {
@@ -112,23 +146,22 @@
 					 			+ boardNo + "&fileNo=" + fileNo;
 				 }
 				 
-				 function fnBtnCommDel(commNo) {					 
-					 
-					 $.ajax({
-						 url: '/comment/deleteComment',
-						 type: 'delete',
-						 data: {
-							 commNo: commNo
-						 },
-						 success: function() {
-							 alert("삭제되었습니다.");
-							 window.location.href = '/board/board/' + $("#boardNo").val() + $(".pageNum").val() + "&amount=" + $(".amount").val();
-						 },
-						 error: function(e) {
-							 console.log(e);
-						 }
-					 })
-				 }
+//				 function fnBtnCommDel(commNo) {							 
+//					 $.ajax({
+//						 url: '/comment/deleteComment',
+//						 type: 'delete',
+//						 data: {
+//							 commNo: commNo
+//						 },
+//						 success: function() {
+//							 alert("삭제되었습니다.");
+//							 window.location.href = '/board/board/' + $("#boardNo").val() + $(".pageNum").val() + "&amount=" + $(".amount").val();
+//						 },
+//						 error: function(e) {
+//							 console.log(e);
+//						 }
+//					 })					 
+//				 }
 				 
 				 function fnBtnReply(commGr, commContent) {
 					 
@@ -412,7 +445,7 @@
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
-					<span>제목: </span><input type="text" name="boardTitle" id="boardTitle" th:value="${getBoard.boardTitle}" readonly><br>
+					<span>제목: </span><span id="boardTitle" th:text="${getBoard.boardTitle}"></span><br>
 					<p th:if="${getBoard.boardPw == null}" th:text="'작성자: ' + ${getBoard.boardWriter}"></p>
 					<p th:unless="${getBoard.boardPw == null}" th:text="'작성자: [비회원]' + ${getBoard.boardWriter}"></p>
 					<div th:if="${getBoard.boardPw != null}" class="boardPw">
@@ -420,7 +453,7 @@
 					</div>
 					<p th:text="${'작성일: ' + #strings.substring(getBoard.boardRegdate, 0, 10) + '&nbsp;' + #strings.substring(getBoard.boardRegdate, 11, 19)}"></p>
 					<p th:text="'조회수: ' + ${getBoard.boardCnt}"></p>
-					<textarea name="boardContent" id="boardContent" cols="50" rows="6" th:text="${getBoard.boardContent}" readonly></textarea>
+					<textarea name="boardContent" id="boardContent" cols="80" rows="20" th:text="${getBoard.boardContent}" readonly></textarea>
 					<div id="filePreview">
 						<p th:if="${boardFileList.size > 0}" class="downloadMent">* 첨부파일명을 클릭하시면 다운로드 됩니다.</p>
 						<div id="attZone">
@@ -448,7 +481,7 @@
 					</div>
 					<div th:unless="${getBoard.boardPw == null}" id="btns">
 						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
-						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 220px;">삭제</button>
+						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 430px;">삭제</button>
 						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
 					</div>
 				</form>

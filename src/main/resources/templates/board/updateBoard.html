@@ -8,7 +8,14 @@
 		 <th:block layout:fragment="script">
 			 <script th:inline="javascript">
 				 $(function() {
-					 
+					 // 제목 글자 수 제한
+					 $("#boardTitle").keyup(function(e) {
+						 text = $(this).val();
+						 
+						 if(text.length > 30) {
+							 $(this).val($(this).val().substring(0, 30));
+						 }
+					 });
 				 });
 				 
 				 function fnBtnMoveList() {					 
@@ -24,11 +31,24 @@
 			 <style>
 				 .cate {
 					 margin-bottom: 16px;
+					 font-size: 1.1em;
+				 }
+				 
+				 .boardTitle {
+					 font-size: 1.1em;
+				 }
+				 
+				 #boardTitle {
+					 font-size: 1.1em;
 				 }
 				 
 				 .writer {
 					 margin-top: 16px;
 					 margin-bottom: 16px;
+				 }
+				 
+				 #boardWriter {
+					 font-size: 1.1em;
 				 }
 				 
 				 #boardContent {
@@ -49,22 +69,37 @@
 					 width: 100%;
 					 height: 100%;
 					 z-index: none;
-					 /*cursor: pointer;*/
 				 }
 				 
 				 .fileNm {
 					 display: inline-block;
 					 font-size: 8px;
-					 /*cursor: pointer;*/
 				 }
 				 
 				 #btns {
-					 margin-top: 20px;
+					 margin-top: 40px;
 					 margin-bottom: 50px;
 				 }
 				 
+				 #btnList, #btnDone {
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
+				 }
+				 
 				 #btnCancel {
-					 margin-left: 250px;
+					 margin-left: 430px;
+					 padding: 8px;
+					 border-radius: 10px;
+					 background-color: #DCDCDC;
+					 border-width: 0;
+					 font-size: 1em;
+					 font-weight: 600;
+					 cursor: pointer;
 				 }
 			 </style>
 		 </th:block>
@@ -80,11 +115,11 @@
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
-					<span>제목: </span><input type="text" name="boardTitle" id="boardTitle" th:value="${getBoard.boardTitle}" required><br>
+					<span class="boardTitle">제목: </span><input type="text" name="boardTitle" id="boardTitle" th:value="${getBoard.boardTitle}" required><br>
 					<div class="writer">
-						<label for="userId" id="boardWriter">작성자: </label><input type="text" name="boardWriter" id="boardWriter" th:value="${getBoard.boardWriter}" readonly>					
+						<label for="userId" id="boardWriter">작성자: </label><span id="boardWriter" th:text="${getBoard.boardWriter}"></span>					
 					</div>
-					<textarea name="boardContent" id="boardContent" cols="50" rows="6" th:text="${getBoard.boardContent}" required></textarea>
+					<textarea name="boardContent" id="boardContent" cols="80" rows="20" th:text="${getBoard.boardContent}" required></textarea>
 					<div id="filePreview">
 						<div id="attZone">
 							<div th:each="boardFile : ${boardFileList}" class="boardFileEach">
