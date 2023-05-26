@@ -34,5 +34,9 @@ public interface BoardService {
 	
 	List<BoardDTO> excelDown(@RequestParam Map<String, String> paramMap, Criteria cri);
 	
-//	List<BoardDTO> excelDown(BoardDTO boardDTO);
+	List<BoardDTO> getBoardListByCategory(@RequestParam int category);
+	
+//	List<BoardDTO> getBoardListByCategory(@RequestParam int category, @RequestParam Map<String, String> paramMap, Criteria cri);
+	
+//	int getBoardTotalCntByCategory(Map<String, String> paramMap, String strCategory);
 }

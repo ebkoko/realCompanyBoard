@@ -434,4 +434,40 @@ public class BoardController {
 		wb.close();
 	}
 	
+	@GetMapping("/getBoardListByCategory")
+	@ResponseBody
+	public List<BoardDTO> getBoardListByCategory(@RequestParam("category") int category) {
+		List<BoardDTO> boardList = boardService.getBoardListByCategory(category);		
+		
+		return boardList;
+	}
+	
+//	@GetMapping("/getBoardListByCategory")
+//	@ResponseBody
+//	public ModelAndView getBoardListByCategory(@RequestParam("category") int category,
+//			@RequestParam Map<String, String> paramMap, Criteria cri) {
+//		paramMap.put("category", String.valueOf(category));
+//		List<BoardDTO> boardList = boardService.getBoardList(paramMap, cri);
+//		
+//		ModelAndView mv = new ModelAndView();
+//		mv.setViewName("board/getBoardList.html");
+//		mv.addObject("getBoardList", boardList);
+//		
+//		if(paramMap.get("searchCondition") != null && !paramMap.get("searchCondition").equals("")) {
+//			mv.addObject("searchCondition", paramMap.get("searchCondition"));
+//		}
+//		
+//		if(paramMap.get("searchKeyword") != null && !paramMap.get("searchKeyword").equals("")) {
+//			mv.addObject("searchKeyword", paramMap.get("searchKeyword"));
+//		}
+//		
+//		System.out.println("searchKeyword: " + paramMap.get("searchKeyword") + ", searchCondition: " + paramMap.get("searchCondition"));
+//		System.out.println("category: " + category);
+//		
+//		int total = boardService.getBoardTotalCnt(paramMap);
+//		
+//		mv.addObject("pageDTO", new PageDTO(cri, total)); 
+//		
+//		return mv;
+//	}
 }

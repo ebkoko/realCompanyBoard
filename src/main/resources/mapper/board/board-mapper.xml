@@ -277,26 +277,100 @@
 	    ORDER BY B.BOARD_NO
 	]]> 
 	</select>
-<!--	
-	<select id="excelDown" parameterType="board" resultType="board">
-		SELECT
+	
+	<select id="getBoardListByCategory" parameterType="board" resultType="board">
+		SELECT 
 			B.BOARD_NO,
-			C.CATE_NAME CATE_NAME,
-			B.BOARD_TITLE,
-			B.BOARD_WRITER,
-			(
-				SELECT IF(ISNULL(B.BOARD_PW), '회원', '비회원')
-			)
-			AS USER_YN,
-			B.BOARD_CONTENT,
-			COUNT(F.FILE_NO) FILE_NO_CNT,
-			B.BOARD_REGDATE,
-			B.BOARD_CNT
-		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_CATEGORY C
-		ON B.CATE_NO = C.CATE_NO
-		LEFT OUTER JOIN T_SB_FILE F
-		ON B.BOARD_NO = F.BOARD_NO 
+			B.CATE_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_WRITER,
+	        B.BOARD_PW,
+	        B.BOARD_REGDATE,
+	        B.BOARD_CNT,
+	        COUNT(F.FILE_NO) FILE_NO_CNT,
+	        U.USER_ROLE
+		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_FILE F
+	    ON B.BOARD_NO = F.BOARD_NO
+	    LEFT OUTER JOIN T_SB_USER U
+	    ON B.BOARD_WRITER = U.USER_ID
+	    WHERE B.CATE_NO = #{category}
+	    GROUP BY B.BOARD_NO
+		ORDER BY B.BOARD_NO DESC
+	</select>
+	
+<!--	<select id="getBoardListByCategory" parameterType="map" resultType="board">
+	<![CDATA[ 
+		SELECT 
+			B.BOARD_NO,
+			B.CATE_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_WRITER,
+	        B.BOARD_PW,
+	        B.BOARD_REGDATE,
+	        B.BOARD_CNT,
+	        COUNT(F.FILE_NO) FILE_NO_CNT,
+	        U.USER_ROLE
+		FROM T_SB_BOARD B LEFT OUTER JOIN T_SB_FILE F
+	    ON B.BOARD_NO = F.BOARD_NO
+	    LEFT OUTER JOIN T_SB_USER U
+	    ON B.BOARD_WRITER = U.USER_ID
+	]]>
+		<if test="boardSearch.searchKeyword != null and boardSearch.searchKeyword != ''">
+		    <if test="boardSearch.searchCondition == 'ALL'">
+		        WHERE 1 = 0
+		        	OR CATE_NO = #{category}
+		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		    </if>
+		    <if test="boardSearch.searchCondition != 'ALL'">
+		        WHERE 1 = 1
+		        <if test="boardSearch.searchCondition == 'TITLE'">
+					AND CATE_NO = #{category}
+		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="boardSearch.searchCondition == 'CONTENT'">
+					AND CATE_NO = #{category}
+		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="boardSearch.searchCondition == 'WRITER'">
+					AND CATE_NO = #{category}
+		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		    </if>
+		</if>	    
+	<![CDATA[ 
 		GROUP BY B.BOARD_NO
-	    ORDER BY B.BOARD_NO
-	</select>-->
+		ORDER BY B.BOARD_NO DESC
+	]]>
+	    LIMIT #{cri.amount} OFFSET #{cri.startNum}
+	</select>
+	
+	<select id="getBoardTotalCntByCategory" parameterType="map" resultType="int">
+		SELECT COUNT(*) FROM T_SB_BOARD
+		<if test="searchKeyword != null and searchKeyword != ''">
+		    <if test="searchCondition == 'ALL'">
+		        WHERE 1 = 0
+		        	OR CATE_NO = #{category}
+		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		    </if>
+		    <if test="searchCondition != 'ALL'">
+		        WHERE 1 = 1
+		        <if test="searchCondition == 'TITLE'">
+					AND CATE_NO = #{category}
+		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="searchCondition == 'CONTENT'">
+					AND CATE_NO = #{category}
+		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		        <if test="searchCondition == 'WRITER'">
+					AND CATE_NO = #{category}
+		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
+		        </if>
+		    </if>
+		</if>
+	</select> -->
 </mapper>

@@ -10,6 +10,9 @@
 				 const pageNumber = /*[[${pageDTO.cri.pageNum}]]*/;
 				 const startNum = /*[[${pageDTO.cri.startNum}]]*/;
 				 const endPage = /*[[${pageDTO.displayPageNum}]]*/;
+				 const getBoardList = /*[[${getBoardList}]]*/;
+				 const amount = /*[[${pageDTO.cri.amount}]]*/;
+				 const boardCateNo = /*[[${boardCateNo}]]*/;
 				 $(function() {
 					 
 					 $(".pagination a").on("click", function(e) {
@@ -30,21 +33,149 @@
 						 $("#searchForm").submit();
 					 })
 					 
-					 $(document).ready(function() {
-					    $("#categorySelect").change(function() {
-					        var selectedValue = $(this).val(); // 선택된 값 가져오기
-					
-					        $("#boardTable tr").each(function() {
-					            var category = $(this).find(".category").text();
-					
-					            if (selectedValue === "전체" || selectedValue === category) {
-					                $(this).show();
-					            } else {
-					                $(this).hide();
-					            }
-					        });
+/*				     $("#categorySelect").change(function() {
+				         var selectedValue = $(this).val(); // 선택된 값 가져오기
+				
+				         $("#boardTable tr").each(function() {
+				            var category = $(this).find(".category").text();
+				
+				            if (selectedValue === "전체" || selectedValue === category) {
+				                $(this).show();
+				            } else {
+				                $(this).hide();
+				            }
+				         });
+				     });
+*/				     
+				     
+				     $("#categorySelect").change(function() {
+					  
+					    // AJAX 요청
+					    $.ajax({
+					      url: '/board/getBoardListByCategory',
+					      type: 'get',
+					      data: {
+					        category: $("#categorySelect").val()/*,
+					        pageNum: pageNumber,
+					        amount: amount,
+					        searchCondition: $("select option:selected").val(),
+					        searchKeyword: $("input[name='searchKeyword']").val()*/
+					      },
+					      success: function(response) {
+					        // 서버에서 받은 응답 데이터를 이용하여 테이블 업데이트
+					        updateBoardTable(response);
+					      },
+					      error: function(xhr, status, error) {
+					        // 오류 처리
+					        console.log("AJAX 오류: " + status + ", " + error);
+					      }
 					    });
-					});
+					  });
+				    
+				
+					  function updateBoardTable(data) {
+					  // 테이블 업데이트를 위해 tbody 요소를 선택
+					  let tbody = $("#boardTable tbody");
+					  console.log(data.length);
+					  
+					  // 기존 테이블 내용 삭제
+					  tbody.empty();
+					  
+					  
+					    let titles = `
+					    <tr>
+							 <th class="boardNo">글 번호</th>
+							 <th class="category">
+					            <select id="categorySelect">
+					                <option selected disabled>글 종류</option>
+					                <option value="3">전체</option>
+					                <option value="0">공지</option>
+					                <option value="1">뉴스</option>
+					                <option value="2">유머</option>
+					            </select>
+					         </th>
+							 <th class="boardTitle">글 제목</th>
+							 <th class="fileCnt">첨부파일(개수)</th>
+							 <th class="boardWriter">작성자</th>
+							 <th class="boardRegdate">작성일</th>
+							 <th class="boardCnt">조회수</th>
+						 </tr>
+					    `;
+					    
+					    tbody.append(titles);
+					    
+					    // getBoardList 배열을 순회하며 테이블의 각 행을 생성합니다.
+						for (var i = 0; i < data.length; i++) {
+						  var board = data[i];
+						  						
+						  //console.log("boardNo: " + board.boardNo);
+						  // 새로운 tr 요소를 생성합니다.
+					  var tr = document.createElement("tr");
+				
+						  // tr에 th, td 요소를 추가하여 행을 구성합니다.
+						  tr.innerHTML = `
+						    <td class="boardNo">${board.boardNo}</td>
+						    <td>${board.cateNo == 0 ? "공지" : board.cateNo == 1 ? "뉴스" : board.cateNo == 2 ? "유머" : "전체"}</td>
+						    <td>
+						      <a class="moveGet" href="/board/updateBoardCnt/${board.boardNo}?pageNum=${pageNumber}&amount=${amount}">
+						        ${board.boardTitle}
+						      </a>
+						    </td>
+						    <td>${board.fileNoCnt}</td>
+						    <td>${board.boardPw == null && board.userRole != 'ADMIN' ? board.boardWriter : board.boardPw != null ? '[비회원] ' + board.boardWriter : board.userRole == 'ADMIN' ? '[관리자] ' + board.boardWriter : ""}</td>
+						    <td>${board.boardRegdate == null ? "" : board.boardRegdate.substring(0, 10)}</td>
+						    <td>${board.boardCnt}</td>
+						    <form id="actionForm" method="get">
+								 <input type="hidden" name="pageNum" value="${pageNumber}">
+								 <input type="hidden" name="amount" value="${amount}">
+							 </form>
+						  `;
+						
+						  // 생성한 tr 요소를 tbody에 추가합니다.
+						  tbody.append(tr);
+						}
+
+					    
+					  // 받은 데이터를 기반으로 테이블 업데이트
+/*					  data.forEach(function(board) {
+					    let category = "";
+					    if (board.cateNo == 0) {
+					      category = "공지";
+					    } else if (board.cateNo == 1) {
+					      category = "뉴스";
+					    } else if (board.cateNo == 2) {
+					      category = "유머";
+					    } else if (board.cateNo == 3) {
+							category = "전체";
+						}
+					    
+					    let writer = "";
+					    if (board.boardPw == null && board.userRole != 'ADMIN') {
+					      writer = board.boardWriter;
+					    } else if (board.boardPw != null) {
+					      writer = "[비회원] " + board.boardWriter;
+					    } else if (board.userRole == 'ADMIN') {
+					      writer = "[관리자] " + board.boardWriter;
+					    }
+					    
+					    let regDate = "";
+					    if (board.boardRegdate != null) {
+					      regDate = board.boardRegdate.substring(0, 10);
+					    }
+					    
+					    
+					    let row = $("<tr>");
+					    row.append($("<td>").text(board.boardNo));
+					    row.append($("<td>").text(category));
+					    row.append($("<td>").append($("<a>").addClass("moveGet").text(board.boardTitle).attr("href", "/board/updateBoardCnt/" + board.boardNo + "?pageNum=" + board.pageNum + "&amount=" + board.amount)));
+					    row.append($("<td>").text(board.fileNoCnt));
+					    row.append($("<td>").text(writer));
+					    row.append($("<td>").text(regDate));
+					    row.append($("<td>").text(board.boardCnt));
+					    
+					    tbody.append(row);
+					  });
+*/					
 					 
 					 
 					 var actionForm = $("#actionForm");
@@ -78,7 +209,7 @@
 					    $(".excelDown").submit();				    
 					    
 					})
-					 
+				 }
 				 });
 			 </script>
 		 </th:block>
@@ -254,12 +385,12 @@
 							 <th class="category">
 					            <select id="categorySelect">
 					                <option selected disabled>글 종류</option>
-					                <option value="전체">전체</option>
+					                <option value="3">전체</option>
 					                <option value="0">공지</option>
 					                <option value="1">뉴스</option>
 					                <option value="2">유머</option>
 					            </select>
-					        </th>
+					         </th>
 							 <th class="boardTitle">글 제목</th>
 							 <th class="fileCnt">첨부파일(개수)</th>
 							 <th class="boardWriter">작성자</th>
