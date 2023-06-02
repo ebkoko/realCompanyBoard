@@ -6,15 +6,17 @@
 	 
 	 <head>
 		 <th:block layout:fragment="script">
+<!--			 <script th:inline="javascript" th:src="@{/js/jquery-3.6.4.min.js}"></script> -->
 			 <script th:inline="javascript">
+				 history.replaceState({}, null, location.pathname);
 				 const pageNumber = /*[[${pageDTO.cri.pageNum}]]*/;
 				 const startNum = /*[[${pageDTO.cri.startNum}]]*/;
 				 const endPage = /*[[${pageDTO.displayPageNum}]]*/;
 				 const getBoardList = /*[[${getBoardList}]]*/;
 				 const amount = /*[[${pageDTO.cri.amount}]]*/;
 				 const boardCateNo = /*[[${boardCateNo}]]*/;
+				 const pageDTO = /*[[${pageDTO}]]*/;
 				 $(function() {
-					 
 					 $(".pagination a").on("click", function(e) {
 						 e.preventDefault();
 						 
@@ -32,25 +34,8 @@
 						 $("input[name='searchKeyword']").val(trimedKeyword);
 						 $("#searchForm").submit();
 					 })
-					 
-/*				     $("#categorySelect").change(function() {
-				         var selectedValue = $(this).val(); // 선택된 값 가져오기
-				
-				         $("#boardTable tr").each(function() {
-				            var category = $(this).find(".category").text();
-				
-				            if (selectedValue === "전체" || selectedValue === category) {
-				                $(this).show();
-				            } else {
-				                $(this).hide();
-				            }
-				         });
-				     });
-*/				     
 				     
-				     $("#categorySelect").change(function() {
-					  
-					    // AJAX 요청
+				     $("#categorySelect").on("change", function() {
 					    $.ajax({
 					      url: '/board/getBoardListByCategory',
 					      type: 'get',
@@ -64,6 +49,8 @@
 					      success: function(response) {
 					        // 서버에서 받은 응답 데이터를 이용하여 테이블 업데이트
 					        updateBoardTable(response);
+					        
+					        $(".originPaging").css("display", "none");
 					      },
 					      error: function(xhr, status, error) {
 					        // 오류 처리
@@ -71,11 +58,45 @@
 					      }
 					    });
 					  });
-				    
-				
-					  function updateBoardTable(data) {
+
+					 var actionForm = $("#actionForm");
+					 
+					 $(".moveGet").on("click", function(e) {
+						e.preventDefault();
+
+						actionForm.append("<input type='hidden' name='boardNo' value='" + $(this).attr("href") + "'>");
+						actionForm.attr("action", $("input[name='boardNo']").val());
+						
+						actionForm.submit(); 
+					 });
+					 
+					$("#btnExcel").on("click", function() {
+						var searchForm = $("#searchForm");
+						var searchCondition = $("select option:selected").val();
+					    var searchKeyword = $("input[name='searchKeyword']").val();
+					    
+					    var searchConditionInput = document.createElement("input");
+					    searchConditionInput.setAttribute("type", "hidden");
+					    searchConditionInput.setAttribute("name", "searchCondition");
+					    searchConditionInput.setAttribute("value", searchCondition);
+					    $(".excelDown").append(searchConditionInput);
+					
+					    var searchKeywordInput = document.createElement("input");
+					    searchKeywordInput.setAttribute("type", "hidden");
+					    searchKeywordInput.setAttribute("name", "searchKeyword");
+					    searchKeywordInput.setAttribute("value", searchKeyword);
+					    $(".excelDown").append(searchKeywordInput);
+					    
+					    $(".excelDown").submit();				    
+					    
+					})
+				 
+				 });
+				 
+				 function updateBoardTable(data) {
 					  // 테이블 업데이트를 위해 tbody 요소를 선택
 					  let tbody = $("#boardTable tbody");
+					  let table = $("#boardTable");
 					  console.log(data.length);
 					  
 					  // 기존 테이블 내용 삭제
@@ -108,9 +129,8 @@
 						for (var i = 0; i < data.length; i++) {
 						  var board = data[i];
 						  						
-						  //console.log("boardNo: " + board.boardNo);
 						  // 새로운 tr 요소를 생성합니다.
-					  var tr = document.createElement("tr");
+					 	  var tr = document.createElement("tr");
 				
 						  // tr에 th, td 요소를 추가하여 행을 구성합니다.
 						  tr.innerHTML = `
@@ -134,83 +154,108 @@
 						  // 생성한 tr 요소를 tbody에 추가합니다.
 						  tbody.append(tr);
 						}
-
-					    
-					  // 받은 데이터를 기반으로 테이블 업데이트
-/*					  data.forEach(function(board) {
-					    let category = "";
-					    if (board.cateNo == 0) {
-					      category = "공지";
-					    } else if (board.cateNo == 1) {
-					      category = "뉴스";
-					    } else if (board.cateNo == 2) {
-					      category = "유머";
-					    } else if (board.cateNo == 3) {
-							category = "전체";
-						}
-					    
-					    let writer = "";
-					    if (board.boardPw == null && board.userRole != 'ADMIN') {
-					      writer = board.boardWriter;
-					    } else if (board.boardPw != null) {
-					      writer = "[비회원] " + board.boardWriter;
-					    } else if (board.userRole == 'ADMIN') {
-					      writer = "[관리자] " + board.boardWriter;
-					    }
-					    
-					    let regDate = "";
-					    if (board.boardRegdate != null) {
-					      regDate = board.boardRegdate.substring(0, 10);
-					    }
-					    
-					    
-					    let row = $("<tr>");
-					    row.append($("<td>").text(board.boardNo));
-					    row.append($("<td>").text(category));
-					    row.append($("<td>").append($("<a>").addClass("moveGet").text(board.boardTitle).attr("href", "/board/updateBoardCnt/" + board.boardNo + "?pageNum=" + board.pageNum + "&amount=" + board.amount)));
-					    row.append($("<td>").text(board.fileNoCnt));
-					    row.append($("<td>").text(writer));
-					    row.append($("<td>").text(regDate));
-					    row.append($("<td>").text(board.boardCnt));
-					    
-					    tbody.append(row);
-					  });
-*/					
-					 
-					 
-					 var actionForm = $("#actionForm");
-					 
-					 $(".moveGet").on("click", function(e) {
-						e.preventDefault();
-
-						actionForm.append("<input type='hidden' name='boardNo' value='" + $(this).attr("href") + "'>");
-						actionForm.attr("action", $("input[name='boardNo']").val());
+						// pageDTO를 그대로 갖고오면 안되고 여기서 따로 설정을 해서 써야하는 듯하다..
 						
-						actionForm.submit(); 
-					 });
-					 
-					$("#btnExcel").on("click", function() {
-						var searchForm = $("#searchForm");
-						var searchCondition = $("select option:selected").val();
-					    var searchKeyword = $("input[name='searchKeyword']").val();
-					    
-					    var searchConditionInput = document.createElement("input");
-					    searchConditionInput.setAttribute("type", "hidden");
-					    searchConditionInput.setAttribute("name", "searchCondition");
-					    searchConditionInput.setAttribute("value", searchCondition);
-					    $(".excelDown").append(searchConditionInput);
-					
-					    var searchKeywordInput = document.createElement("input");
-					    searchKeywordInput.setAttribute("type", "hidden");
-					    searchKeywordInput.setAttribute("name", "searchKeyword");
-					    searchKeywordInput.setAttribute("value", searchKeyword);
-					    $(".excelDown").append(searchKeywordInput);
-					    
-					    $(".excelDown").submit();				    
-					    
-					})
-				 }
-				 });
+						
+						
+						let pagingPart = `
+								<br/>
+								<div class="numPage">
+									<ul class="pagination">
+							`;
+						
+						if(pageDTO.prev) {
+							pagingPart += `
+									<li class="pagination_button btnFirst">
+										<a href="1" class="btnpage" data-pagingPage="1">처음으로</a>
+									</li>
+									<li class="pagination_button btnPrev">
+										<a href="/board/boardList?page=${pageNumber - 1}" class="btnPage" data-pagingPage="${pageNumber - 1}">이전</a>
+									</li>
+								`;
+						}
+						
+						console.log("startPage: " + pageDTO.startPage + ", pageNumber: " + pageNumber);
+						for(let i = pageDTO.startPage; i <= endPage; i++) {
+							if(pageNumber == i) {
+								pagingPart += `
+									<li class="pagination_button">
+										<a href="/board/boardList?page=${i}" class="btnPage active" data-pagingPage="${i}">${i}</a>
+									</li>
+								`;
+							} else {
+								pagingPart += `
+									<li class="pagination_button">
+										<a href="/board/boardList?page=${i}" class="btnPage" data-pagingPage="${i}">${i}</a>
+									</li>
+								`;
+								
+							}							
+						}
+						
+						if(pageDTO.next) {
+							pagingPart += `
+								<li class="pagination_button">
+									<a href="/board/boardList?page=${pageNumber + 1}" class="btnPage" data-pagingPage="${pageNumber + 1}">다음</a>
+								</li>
+								<li class=pagination_button>
+									<a href="/board/boardList?page=${pageDTO.lastPage}" class="btnpage" data-pagingPage="${pageDTO.lastPage}">맨 끝으로</a>
+								</li>
+							`;
+						}
+						
+						pagingPart += `
+							</ul>
+						</div>
+						`;
+						
+						
+						table.after(pagingPart);
+				}
+				 
+				 function fnIntoBoard(boardNo, pageNum, amount, searchCondition, searchKeyword) {					 
+					  let f = document.createElement('form');
+					  
+					  let obj1 = document.createElement('input');
+					  obj1.setAttribute('type', 'hidden');
+					  obj1.setAttribute('name', 'boardNo');
+					  obj1.setAttribute('value', getBoardList.boardNo);
+					  
+					  let obj2 = document.createElement('input');
+					  obj2.setAttribute('type', 'hidden');
+					  obj2.setAttribute('name', 'pageNum');
+					  obj2.setAttribute('value', pageNumber);
+					  
+					  let obj3 = document.createElement('input');
+					  obj3.setAttribute('type', 'hidden');
+					  obj3.setAttribute('name', 'amount');
+					  obj3.setAttribute('value', amount);
+					  
+					  let obj4 = document.createElement('input');
+					  obj4.setAttribute('type', 'hidden');
+					  obj4.setAttribute('name', 'searchCondition');
+					  obj4.setAttribute('value', $("#categorySelect").val());
+					  
+					  
+					  var keyword = $("input[name='searchKeyword']").val();
+					  var trimedKeyword = "";
+					 						 
+					  trimedKeyword = keyword.trim();
+					  let obj5 = document.createElement('input');
+					  obj5.setAttribute('type', 'hidden');
+					  obj5.setAttribute('name', 'searchKeyword');
+					  obj5.setAttribute('value', trimedKeyword);
+					  
+					  f.appendChild(obj1);
+					  f.appendChild(obj2);
+					  f.appendChild(obj3);
+					  f.appendChild(obj4);
+					  f.appendChild(obj5);
+					  f.setAttribute('method', 'post');
+					  f.setAttribute('action', '/board/updateBoardCnt/' + getBoardList.boardNo);
+					  document.body.appendChild(f);
+					  f.submit();
+				  }
 			 </script>
 		 </th:block>
 		 <th:block layout:fragment="css">
@@ -380,7 +425,7 @@
 						 <button type="button" id="btnExcel">엑셀 다운로드</button>
 					 </form>
 					 <table id="boardTable">
-						 <tr>
+						 <tr class="firstTr">
 							 <th class="boardNo">글 번호</th>
 							 <th class="category">
 					            <select id="categorySelect">
@@ -403,7 +448,8 @@
 							 <td th:if="${board.cateNo == 1}">뉴스</td>
 							 <td th:if="${board.cateNo == 2}">유머</td>
 							 <td>
-								 <a class="moveGet" th:text="${board.boardTitle}" th:href="@{/board/updateBoardCnt/{boardNo} (boardNo=${board.boardNo}, pageNum=${pageDTO.cri.pageNum}, amount=${pageDTO.cri.amount})}"></a>
+								 <a class="moveGet" th:text="${board.boardTitle}" th:href="@{/board/updateBoardCnt/{boardNo} (boardNo=${board.boardNo}, pageNum=${pageDTO.cri.pageNum}, amount=${pageDTO.cri.amount}, searchCondition=${searchCondition}, searchKeyword=${searchKeyword})}"></a> 
+<!--								 <a class="moveGet" th:text="${board.boardTitle}" href="javascript:void(0)" th:onclick="fnIntoBoard([[${board.boardNo}]], [[${pageDTO.cri.pageNum}]], [[${pageDTO.cri.amount}]], [[${searchCondition}]], [[${searchKeyword}]])"></a> -->
 							 </td>
 							 <td th:text="${board.fileNoCnt}"></td>
 							 <td th:if="${board.boardPw == null && board.userRole != 'ADMIN'}" th:text="${board.boardWriter}"></td>
@@ -418,7 +464,7 @@
 						 </tr>
 					 </table>
 					 <br/>					 
-					 <div class="numPage">
+					 <div class="numPage originPaging">
 						 <ul class="pagination" th:if="${getBoardList.size > 0}">
 							 <li th:if="${pageDTO.prev}" class="pagination_button btnFirst">
 								 <a href="1" class="btnPage" th:attr="data-pagingPage=1">처음으로</a>

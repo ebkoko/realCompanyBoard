@@ -296,6 +296,7 @@
 	    WHERE B.CATE_NO = #{category}
 	    GROUP BY B.BOARD_NO
 		ORDER BY B.BOARD_NO DESC
+		LIMIT 10
 	</select>
 	
 <!--	<select id="getBoardListByCategory" parameterType="map" resultType="board">
@@ -317,24 +318,20 @@
 	]]>
 		<if test="boardSearch.searchKeyword != null and boardSearch.searchKeyword != ''">
 		    <if test="boardSearch.searchCondition == 'ALL'">
-		        WHERE 1 = 0
-		        	OR CATE_NO = #{category}
+		        WHERE (1 = 0 OR CATE_NO = #{category})
 		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		    </if>
 		    <if test="boardSearch.searchCondition != 'ALL'">
-		        WHERE 1 = 1
+		        WHERE 1 = 1 AND CATE_NO = #{category}
 		        <if test="boardSearch.searchCondition == 'TITLE'">
-					AND CATE_NO = #{category}
 		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		        <if test="boardSearch.searchCondition == 'CONTENT'">
-					AND CATE_NO = #{category}
 		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		        <if test="boardSearch.searchCondition == 'WRITER'">
-					AND CATE_NO = #{category}
 		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{boardSearch.searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		    </if>
@@ -350,24 +347,20 @@
 		SELECT COUNT(*) FROM T_SB_BOARD
 		<if test="searchKeyword != null and searchKeyword != ''">
 		    <if test="searchCondition == 'ALL'">
-		        WHERE 1 = 0
-		        	OR CATE_NO = #{category}
+		        WHERE (1 = 0 OR CATE_NO = #{category})
 		            OR BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		            OR BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		            OR BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		    </if>
 		    <if test="searchCondition != 'ALL'">
-		        WHERE 1 = 1
+		        WHERE 1 = 1 AND CATE_NO = #{category}
 		        <if test="searchCondition == 'TITLE'">
-					AND CATE_NO = #{category}
 		            AND BOARD_TITLE REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		        <if test="searchCondition == 'CONTENT'">
-					AND CATE_NO = #{category}
 		            AND BOARD_CONTENT REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		        <if test="searchCondition == 'WRITER'">
-					AND CATE_NO = #{category}
 		            AND BOARD_WRITER REGEXP CONCAT('.*', REPLACE(#{searchKeyword}, ' ', '.*'), '.*')
 		        </if>
 		    </if>

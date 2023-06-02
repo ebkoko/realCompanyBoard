@@ -1,7 +1,6 @@
 package com.example.springboard.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import com.example.springboard.dto.UserDTO;
 

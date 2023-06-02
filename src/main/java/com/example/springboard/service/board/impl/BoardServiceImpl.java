@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,9 +112,9 @@ public class BoardServiceImpl implements BoardService {
 	}
 	
 //	@Override
-//	public List<BoardDTO> getBoardListByCategory(@RequestParam int category, @RequestParam Map<String, String> paramMap, Criteria cri) {
+//	public List<BoardDTO> getBoardListByCategory(@RequestParam Map<String, String> paramMap, Criteria cri) {
 //		Map<String, Object> pMap = new HashMap<String, Object>();
-//		pMap.put("category", category);
+//		
 //		pMap.put("boardSearch", paramMap);
 //
 //		cri.setStartNum((cri.getPageNum() - 1) * cri.getAmount());
@@ -128,9 +124,7 @@ public class BoardServiceImpl implements BoardService {
 //	}
 //	
 //	@Override
-//	public int getBoardTotalCntByCategory(Map<String, String> paramMap, String strCategory) {
-//		paramMap.put("category", strCategory);
-//		
+//	public int getBoardTotalCntByCategory(Map<String, String> paramMap) {
 //		return boardMapper.getBoardTotalCntByCategory(paramMap);
 //	}
 }

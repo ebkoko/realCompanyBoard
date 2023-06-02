@@ -7,9 +7,10 @@
 	 <head>
 		 <th:block layout:fragment="script">
 			 <script th:inline="javascript">
+				 //history.replaceState({}, null, location.pathname);
 				 const boardNo = /*[[getBoard.boardNo]]*/;
 				 const fileNo = /*[[boardFileList.fileNo]]*/;
-				 const commNo = /*[[comment.commNo]]*/;
+				 const commNo = /*[[comment.commNo]]*/;				 
 				 $(function() {
 					 
 					 // 답글 글자 수 제한
@@ -23,9 +24,8 @@
 					 
 				 });
 				 
-				 function fnBtnMoveList() {					 
-					 
-					 window.location.href = '/board/boardList?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+				 function fnBtnMoveList(searchCondition, searchKeyword) {					 					 
+					 window.location.href = '/board/boardList?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val() + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
 				 }
 				 
 				 
@@ -91,8 +91,6 @@
 								 }
 								 
 							 }
-							 
-							 
 						
 						 },
 						 fail: function(result) {
@@ -103,7 +101,7 @@
 						 
 				 }
 				 
-				 function fnBtnModify() {
+				 function fnBtnModify(searchCondition, searchKeyword) {
 					 let pageNum = document.getElementsByClassName("pageNum").value;
 					 let amount = document.getElementsByClassName("amount").value;
 					 
@@ -126,7 +124,7 @@
 								 }
 								 							 
 								 
-								 window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+								 window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val() + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
 							 },
 							 error: function(e) {
 								 console.log(e);
@@ -134,34 +132,44 @@
 							 }
 					 	})
 				 	 } else {
-						  window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val();
+						  window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val() + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
 					  }
 					 
-					 
-					 
 				 }
+				 
+				 function fnCommDone() {
+					 if(!$(".intoCommWriter").val() || $(".intoCommWriter").val() == '') {
+						 alert("댓글 작성자를 입력해주세요.");
+						 $(".intoCommWriter").focus();
+						 return;
+					 }
+					 if(!$(".commContentInsert").val() || $(".commContentInsert").val() == '') {
+						 alert("댓글 내용을 입력해주세요.");
+						 $(".commContentInsert").focus();
+						 return;
+					 }
+					 
+					 $.ajax({
+						 url: '/comment/insertComment',
+						 type: 'post',
+						 data: $("#insertCommForm").serialize(),
+						 success: function(data) {
+							 console.log(data);
+							 alert("댓글이 작성되었습니다.");
+							 location.reload(".commT");
+						 },
+						 error: function(e) {
+							 console.log(e);
+						 }
+					 })
+				 }
+				 
 				 
 				 function fnFileDown(boardNo, fileNo) {
 					 window.location = "/board/fileDown?boardNo="
 					 			+ boardNo + "&fileNo=" + fileNo;
 				 }
-				 
-//				 function fnBtnCommDel(commNo) {							 
-//					 $.ajax({
-//						 url: '/comment/deleteComment',
-//						 type: 'delete',
-//						 data: {
-//							 commNo: commNo
-//						 },
-//						 success: function() {
-//							 alert("삭제되었습니다.");
-//							 window.location.href = '/board/board/' + $("#boardNo").val() + $(".pageNum").val() + "&amount=" + $(".amount").val();
-//						 },
-//						 error: function(e) {
-//							 console.log(e);
-//						 }
-//					 })					 
-//				 }
+				
 				 
 				 function fnBtnReply(commGr, commContent) {
 					 
@@ -232,6 +240,33 @@
 						 }					 
 					 });
 					 
+				 }
+				 
+				 function fnReplyDone() {
+					 if(!$(".intoReplyWriter").val() || $(".intoReplyWriter").val() == '') {
+						 alert("댓글 작성자를 입력해주세요.");
+						 $(".intoReplyWriter").focus();
+						 return;
+					 }
+					 if(!$(".replyContent").val() || $(".replyContent").val() == '') {
+						 alert("댓글 내용을 입력해주세요.");
+						 $(".replyContent").focus();
+						 return;
+					 }
+					 
+					 $.ajax({
+						 url: '/comment/insertReply',
+						 type: 'post',
+						 data: $("#insertReplyForm").serialize(),
+						 success: function(data) {
+							 console.log(data);
+							 alert("답글이 작성되었습니다.");
+							 location.reload(".commT");
+						 },
+						 error: function(e) {
+							 console.log(e);
+						 }
+					 })
 				 }
 			 </script>
 		 </th:block>
@@ -442,6 +477,8 @@
 					<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
 					<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
 					<input type="hidden" name="amount" class="amount" th:value="${amount}"> 
+					<input type="hidden" name="searchCondition" th:value="${searchCondition}">
+					<input type="hidden" name="searchKeyword" th:value="searchKeyword"> 
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
@@ -477,12 +514,12 @@
 						</div>
 					</div>
 					<div th:if="${getBoard.boardPw == null}" id="btns">
-						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnList" th:onclick="fnBtnMoveList([[${searchCondition}]], [[${searchKeyword}]])">목록</button>
 					</div>
 					<div th:unless="${getBoard.boardPw == null}" id="btns">
-						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnList" th:onclick="fnBtnMoveList([[${searchCondition}]], [[${searchKeyword}]])">목록</button>
 						<button type="button" id="btnDelete" onclick="fnBtnDelete()" style="margin-left: 430px;">삭제</button>
-						<button type="button" id="btnModify" th:onclick="fnBtnModify()">수정</button>
+						<button type="button" id="btnModify" th:onclick="fnBtnModify([[${searchCondition}]], [[${searchKeyword}]])">수정</button>
 					</div>
 				</form>
 				<br><br><br>
@@ -510,18 +547,20 @@
 				<div class="reply">
 					<h3 class="replyMent">답글 쓰기</h3>
 					<div class="replyForm">
-						<form action="/comment/insertReply" method="post">								
+						<form id="insertReplyForm" action="/comment/insertReply" method="post">								
 							<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
 							<input type="hidden" name="amount" class="amount" th:value="${amount}"> 
+							<input type="hidden" name="searchCondition" th:value="${searchCondition}">
+							<input type="hidden" name="searchKeyword" th:value="${searchKeyword}"> 
 							<div class="wrapReplyWriter">
-								<label for="commWriter" id="replyWriter">작성자: </label><input type="text" name="commWriter" th:value="${getBoard.boardWriter}" readonly>
+								<label for="commWriter" id="replyWriter">작성자: </label><input type="text" class="intoReplyWriter" name="commWriter" th:value="${getBoard.boardWriter}" readonly>
 							</div>
 							<div>
 								<textarea name="commContent" class="replyContent" rows="5" cols="50" required></textarea> 
 							</div>
 							<div>
 								<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
-								<button type="submit" id="btnReplyDone">답글 등록</button>
+								<button type="button" id="btnReplyDone" onclick="fnReplyDone()">답글 등록</button>
 							</div>
 						</form>
 					</div>
@@ -530,18 +569,20 @@
 				
 				<h3>댓글 쓰기</h3>
 				<div class="commForm">
-					<form action="/comment/insertComment" method="post">							
+					<form id="insertCommForm" action="/comment/insertComment" method="post">							
 						<input type="hidden" name="pageNum" class="pageNum" th:value="${pageNum}">
 						<input type="hidden" name="amount" class="amount" th:value="${amount}"> 
+						<input type="hidden" name="searchCondition" th:value="${searchCondition}">
+						<input type="hidden" name="searchKeyword" th:value="${searchKeyword}"> 
 						<div class="wrapCommWriter">
-							<label for="commWriter" id="commWriter">작성자: </label><input type="text" name="commWriter" required>
+							<label for="commWriter" id="commWriter">작성자: </label><input type="text" class="intoCommWriter" name="commWriter" required>
 						</div>
 						<div>
 							<textarea name="commContent" class="commContentInsert" rows="5" cols="50" required></textarea>
 						</div>
 						<div>
 							<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
-							<button type="submit" id="btnCommDone">댓글 등록</button>
+							<button type="button" id="btnCommDone" onclick="fnCommDone()">댓글 등록</button>
 						</div>
 					</form>
 				</div>

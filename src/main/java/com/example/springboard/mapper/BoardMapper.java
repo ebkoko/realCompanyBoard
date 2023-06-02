@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.springboard.dto.BoardDTO;
-import com.example.springboard.dto.Criteria;
 
 @Mapper
 public interface BoardMapper {

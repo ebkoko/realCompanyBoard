@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,10 +54,11 @@ public class CommentController {
 	@RequestMapping("/insertComment")
 	public void insertComment(CommentDTO commentDTO,
 			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 		commentService.insertComment(commentDTO);
 		
-		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount); 
+		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword); 
 	}
 	
 	// 댓글 삭제
@@ -106,6 +106,7 @@ public class CommentController {
 	@PostMapping("/updateComment")
 	public void updateComment(@RequestParam("commNo") int commNo, CommentDTO commentDTO,
 			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 
 		CommentDTO updateComm = CommentDTO.builder()
@@ -122,7 +123,7 @@ public class CommentController {
 		
 		commentService.updateComm(commentDTO);
 
-		response.sendRedirect("/board/board/" + updateComm.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
+		response.sendRedirect("/board/board/" + updateComm.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword);
 	}
 	
 	
@@ -130,10 +131,11 @@ public class CommentController {
 	@RequestMapping("/insertReply")
 	public void insertReply(CommentDTO commentDTO,
 			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 		commentService.insertReply(commentDTO);
 		
-		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount);
+		response.sendRedirect("/board/board/" + commentDTO.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword);
 	}
 	
 }

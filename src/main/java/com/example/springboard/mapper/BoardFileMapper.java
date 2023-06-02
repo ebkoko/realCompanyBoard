@@ -5,10 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
-import org.springframework.data.repository.query.Param;
 
-import com.example.springboard.dto.BoardDTO;
 import com.example.springboard.dto.BoardFileDTO;
 
 @Mapper

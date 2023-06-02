@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -140,18 +139,22 @@ public class BoardController {
 	}
 	
 	// 조회수 증가
-	@GetMapping("/updateBoardCnt/{boardNo}")
+	@RequestMapping("/updateBoardCnt/{boardNo}")
 	public void updateBoardCnt(@PathVariable("boardNo") int boardNo,
-			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount, HttpServletResponse response) throws IOException {
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword,
+			HttpServletResponse response) throws IOException {
 		boardService.updateBoardCnt(boardNo);
 		
-		response.sendRedirect("/board/board/" + boardNo + "?pageNum=" + pageNum + "&amount=" + amount);
+		response.sendRedirect("/board/board/" + boardNo + "?pageNum=" + pageNum + "&amount=" + amount + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword);
 	}
 	
 	// 게시글 상세
 	@GetMapping("/board/{boardNo}")
 	public ModelAndView getBoard(@PathVariable("boardNo") int boardNo,
-			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount, HttpSession session, CommentDTO commentDTO) {
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword,
+			HttpSession session, CommentDTO commentDTO) {
 		UserDTO loginUser = (UserDTO)session.getAttribute("loginUser");
 				
 		BoardDTO board = boardService.getBoard(boardNo);
@@ -196,6 +199,8 @@ public class BoardController {
 			mv.addObject("boardFileList", boardFileDTOList);
 			mv.addObject("pageNum", pageNum);
 			mv.addObject("amount", amount);
+			mv.addObject("searchCondition", searchCondition);
+			mv.addObject("searchKeyword", searchKeyword);
 			
 			// 댓글
 			List<CommentDTO> comment = commentService.getComment(commentDTO);
@@ -211,6 +216,8 @@ public class BoardController {
 			mv.addObject("boardFileList", boardFileDTOList);
 			mv.addObject("pageNum", pageNum);
 			mv.addObject("amount", amount);
+			mv.addObject("searchCondition", searchCondition);
+			mv.addObject("searchKeyword", searchKeyword);
 			
 			// 댓글
 			List<CommentDTO> comment = commentService.getComment(commentDTO);
@@ -231,7 +238,8 @@ public class BoardController {
 	// 게시글 수정
 	@GetMapping("/updateBoard/{boardNo}")
 	public ModelAndView updateBoardView(@PathVariable("boardNo") int boardNo,
-			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount) {
+			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchCondition, @RequestParam("searchKeyword") String searchKeyword) {
 		BoardDTO board = boardService.getBoard(boardNo);
 		
 		BoardDTO boardDTO = BoardDTO.builder()
@@ -267,6 +275,8 @@ public class BoardController {
 		mv.addObject("boardFileList", boardFileDTOList);
 		mv.addObject("pageNum", pageNum);
 		mv.addObject("amount", amount);
+		mv.addObject("searchCondition", searchCondition);
+		mv.addObject("searchKeyword", searchKeyword);
 		
 		return mv;
 	}
@@ -289,16 +299,16 @@ public class BoardController {
 				if(checkedBoard.getBoardNo() != boardDTO.getBoardNo()) {
 					returnMap.put("msg", "boardNoDiff");
 				} else {
-					BoardDTO okBoard = BoardDTO.builder()
-												.boardNo(checkedBoard.getBoardNo())
-												.cateNo(checkedBoard.getCateNo())
-												.boardTitle(checkedBoard.getBoardTitle())
-												.boardWriter(checkedBoard.getBoardWriter())
-												.boardPw(checkedBoard.getBoardPw())
-												.boardRegdate(checkedBoard.getBoardRegdate())
-												.boardCnt(checkedBoard.getBoardCnt())
-												.boardContent(checkedBoard.getBoardContent())
-												.build();
+//					BoardDTO okBoard = BoardDTO.builder()
+//												.boardNo(checkedBoard.getBoardNo())
+//												.cateNo(checkedBoard.getCateNo())
+//												.boardTitle(checkedBoard.getBoardTitle())
+//												.boardWriter(checkedBoard.getBoardWriter())
+//												.boardPw(checkedBoard.getBoardPw())
+//												.boardRegdate(checkedBoard.getBoardRegdate())
+//												.boardCnt(checkedBoard.getBoardCnt())
+//												.boardContent(checkedBoard.getBoardContent())
+//												.build();
 												
 					returnMap.put("msg", "boardPwSuccess");
 				}
@@ -320,6 +330,7 @@ public class BoardController {
 	@PostMapping("/updateBoard")
 	public void updateBoard(BoardDTO boardDTO,
 			@RequestParam("pageNum") int pageNum, @RequestParam("amount") int amount,
+			@RequestParam("searchCondition") String searchConditon, @RequestParam("searchKeyword") String searchKeyword,
 			HttpServletResponse response, HttpServletRequest request) throws IOException {
 		BoardDTO board = BoardDTO.builder()
 								 .boardNo(boardDTO.getBoardNo())
@@ -336,7 +347,7 @@ public class BoardController {
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
 		out.println("<script>alert('게시글이 수정되었습니다.'); window.location.href='board/"
-				+ board.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "';</script>");
+				+ board.getBoardNo() + "?pageNum=" + pageNum + "&amount=" + amount + "&searchCondition=" + searchConditon + "&searchKeyword=" + searchKeyword + "';</script>");
 		
 	}
 	
@@ -447,7 +458,7 @@ public class BoardController {
 //	public ModelAndView getBoardListByCategory(@RequestParam("category") int category,
 //			@RequestParam Map<String, String> paramMap, Criteria cri) {
 //		paramMap.put("category", String.valueOf(category));
-//		List<BoardDTO> boardList = boardService.getBoardList(paramMap, cri);
+//		List<BoardDTO> boardList = boardService.getBoardListByCategory(paramMap, cri);
 //		
 //		ModelAndView mv = new ModelAndView();
 //		mv.setViewName("board/getBoardList.html");
@@ -464,7 +475,7 @@ public class BoardController {
 //		System.out.println("searchKeyword: " + paramMap.get("searchKeyword") + ", searchCondition: " + paramMap.get("searchCondition"));
 //		System.out.println("category: " + category);
 //		
-//		int total = boardService.getBoardTotalCnt(paramMap);
+//		int total = boardService.getBoardTotalCntByCategory(paramMap);
 //		
 //		mv.addObject("pageDTO", new PageDTO(cri, total)); 
 //		

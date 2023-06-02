@@ -3,8 +3,6 @@ package com.example.springboard.service.board;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.springboard.dto.BoardDTO;
@@ -36,7 +34,7 @@ public interface BoardService {
 	
 	List<BoardDTO> getBoardListByCategory(@RequestParam int category);
 	
-//	List<BoardDTO> getBoardListByCategory(@RequestParam int category, @RequestParam Map<String, String> paramMap, Criteria cri);
-	
-//	int getBoardTotalCntByCategory(Map<String, String> paramMap, String strCategory);
+//	List<BoardDTO> getBoardListByCategory(@RequestParam Map<String, String> paramMap, Criteria cri);
+//	
+//	int getBoardTotalCntByCategory(Map<String, String> paramMap);
 }

@@ -7,6 +7,7 @@
 	 <head>
 		 <th:block layout:fragment="script">
 			 <script th:inline="javascript">
+				 history.replaceState({}, null, location.pathname);
 				 $(function() {
 					 // 제목 글자 수 제한
 					 $("#boardTitle").keyup(function(e) {
@@ -18,11 +19,11 @@
 					 });
 				 });
 				 
-				 function fnBtnMoveList() {					 
+				 function fnBtnMoveList(searchCondition, searchKeyword) {					 
 					 let pageNum = document.getElementById("pageNum").value;
 					 let amount = document.getElementById("amount").value;
 					 
-					 window.location.href = '/board/boardList?pageNum=' + pageNum + "&amount=" + amount;
+					 window.location.href = '/board/boardList?pageNum=' + pageNum + "&amount=" + amount + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
 				 }
 			 </script>
 		 </th:block>
@@ -112,6 +113,8 @@
 					<input type="hidden" name="boardNo" id="boardNo" th:value="${getBoard.boardNo}">
 					<input type="hidden" name="pageNum" id="pageNum" th:value="${pageNum}">
 					<input type="hidden" name="amount" id="amount" th:value="${amount}"> 
+					<input type="hidden" name="searchCondition" th:value="${searchCondition}">
+					<input type="hidden" name="searchKeyword" th:value="${searchKeyword}">
 					<div class="cate" th:if="${getBoard.cateNo == 0}">공지</div>
 					<div class="cate" th:if="${getBoard.cateNo == 1}">뉴스</div>
 					<div class="cate" th:if="${getBoard.cateNo == 2}">유머</div>
@@ -142,7 +145,7 @@
 						</div>
 					</div>
 					<div id="btns">
-						<button type="button" id="btnList" onclick="fnBtnMoveList()">목록</button>
+						<button type="button" id="btnList" th:onclick="fnBtnMoveList([[${searchCondition}]], [[${searchKeyword}]])">목록</button>
 						<button type="button" id="btnCancel" onclick="history.back();">취소</button>
 						<button type="submit" id="btnDone">등록</button>
 					</div>
