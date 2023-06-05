@@ -98,7 +98,7 @@ public class BoardServiceImpl implements BoardService {
 		Map<String, Object> pMap = new HashMap<String, Object>();
 		
 		pMap.put("boardSearch", paramMap);
-
+		
 		cri.setStartNum((cri.getPageNum() - 1) * cri.getAmount());
 		pMap.put("cri", cri);
 		
