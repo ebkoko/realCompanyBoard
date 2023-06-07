@@ -374,6 +374,7 @@ public class BoardController {
 		return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
 	}
 	
+	// 엑셀 다운
 	@GetMapping("/excelDown")
 	public void excelDownload(BoardDTO boardDTO, HttpServletResponse response,
 			@RequestParam Map<String, String> paramMap, Criteria cri) throws IOException {

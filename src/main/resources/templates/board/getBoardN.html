@@ -24,33 +24,14 @@
 					 
 				 });
 				 
+				 window.addEventListener('DOMContentLoaded', function() {
+					 var textarea = document.getElementById('boardContent');
+					 textarea.style.height = textarea.scrollHeight + 'px';
+				 });
+				 
 				 function fnBtnMoveList(searchCondition, searchKeyword) {					 					 
 					 window.location.href = '/board/boardList?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val() + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
 				 }
-				 
-				 
-//				 function fnBtnMoveList() {
-//				    var pageNum = $(".pageNum").val();
-//				    var amount = $(".amount").val();
-				
-//				    $.ajax({
-//				        type: "GET",
-//				        url: "/board/boardList",
-//				        data: {
-//				            pageNum: pageNum,
-//				            amount: amount
-//				        },
-//				        success: function() {
-				            // 서버 응답에 따른 처리 작성
-//				            window.location.href = '/board/boardList';
-//				        },
-//				        error: function() {
-				            // 에러 처리 작성
-//				        }
-//				    });
-//				}
-
-				 
 				 
 				 function fnBtnDelete() {					 
 					 $.ajax({
@@ -131,9 +112,7 @@
 								 
 							 }
 					 	})
-				 	 } else {
-						  window.location.href = '/board/updateBoard/' + $("#boardNo").val() + '?pageNum=' + $(".pageNum").val() + "&amount=" + $(".amount").val() + "&searchCondition=" + searchCondition + "&searchKeyword=" + searchKeyword;
-					  }
+				 	 }
 					 
 				 }
 				 
@@ -523,7 +502,6 @@
 					</div>
 				</form>
 				<br><br><br>
-				
 				<h3>댓글</h3>
 				<form id="getCommForm">
 					<input type="hidden" name="boardNo" th:value="${getBoard.boardNo}">
@@ -565,8 +543,6 @@
 						</form>
 					</div>
 				</div>
-				
-				
 				<h3>댓글 쓰기</h3>
 				<div class="commForm">
 					<form id="insertCommForm" action="/comment/insertComment" method="post">							
